@@ -125,7 +125,6 @@ create_client_installers() {
     echo "sudo systemctl daemon-reload && \\"
     echo "echo 'para.service has been updated with the new ExecStart line:' && \\"
     echo "grep 'ExecStart=' \$SERVICE_FILE && \\"
-    echo "echo \"New ExecStart line: ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers 1.4.21.1\""
     echo "curl -s -o /root/ceremonyclient/node/para.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/para.sh && \\"
     echo "if [ -f /root/ceremonyclient/node/para.sh ]; then echo 'para.sh created'; else echo 'Failed to create para.sh'; fi && \\"
     echo "yes | sudo ufw enable && sudo ufw allow 22 && sudo ufw allow 443 && sudo ufw allow 8336 && \\"
@@ -134,6 +133,7 @@ create_client_installers() {
     echo "echo 'Running clustermaster.bash...' && \\"
     echo "curl -s -o /root/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
     echo "if [ -f /root/clustermaster.bash ]; then chmod +x /root/clustermaster.bash && /root/clustermaster.bash; else echo 'Failed to download clustermaster.bash'; fi && \\"
+    echo "echo \"New ExecStart line: ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers 1.4.21.1\""
     echo -e "\e[0m"
     echo "#######################👆  END - DONT COPY THIS LINE  👆########################"
 }
