@@ -88,11 +88,11 @@ while true; do
     read -p "Choose an option: " main_option
     
     case $main_option in
-        1) install_functions_from_github ;;  # Download functions if missing
+        1) install_functions_from_github ;;  # Assuming this is a defined function
         2) set_cluster ;;  # Function to set up the cluster
         3) quick_setup ;;  # Runs the QuickSetup function
         4) generate_client_script_install_oneliner ;;  # Calls the client script install generator
-        5) generate_client_config_install_oneliner ;;  # Calls the client config install generator
+        5) generate_simple_client_config_install_command ;;  # Fix: Calls the correct function for config install
         6) advanced_setup ;;  # Shows the advanced setup submenu
         7) exit 0 ;;  # Exit the script
         *) echo "Invalid option. Please choose again." ;;
