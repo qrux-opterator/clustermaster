@@ -141,6 +141,11 @@ create_client_installers() {
 
 # Function to create the IP-Block for config
 create_ip_block() {
+    # Define the necessary variables
+    SETTINGS_FILE="/root/cm_settings.txt"
+    CONFIG_BLOCK_FILE="/root/config_block.txt"
+
+    # Check if the settings file exists
     if [ ! -f "$SETTINGS_FILE" ]; then
         echo "Settings file not found! Please set your cluster first."
         return
@@ -176,6 +181,7 @@ create_ip_block() {
 
     echo "Config block saved to $CONFIG_BLOCK_FILE."
 }
+
 
 # Function to back up and set the config
 backup_and_setconfig() {
