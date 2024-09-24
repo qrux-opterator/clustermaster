@@ -33,8 +33,10 @@ generate_simple_client_config_install_command() {
 
 
 set_cluster() {
-    echo "Enter your cluster details (IP and threads per IP), one per line."
-    echo "Format: IP Threads - example:"
+    echo -e "Enter your cluster details (IP and threads per IP), one per line."
+    set +H
+    echo -e "Format: IP Threads - \e[32mFirst IP is your Master!\e[0m - example:"
+    set -H
     echo "192.168.0.1 32"
     echo "192.168.0.2 32"
     echo "192.168.0.3 48"
