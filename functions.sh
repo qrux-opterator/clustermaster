@@ -13,7 +13,7 @@ generate_simple_client_config_install_command() {
 
     # Generate the one-liner to be run on the client machine
     echo "##################################################################################"
-    echo "################ 👇COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
+    echo "################ 👇COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"'\e[34m'
     echo "mkdir -p /root/ClusterMaster_Backup && \\"
     echo "if [ -f /root/ceremonyclient/node/.config/config.yml ]; then \\"
     echo "  mv /root/ceremonyclient/node/.config/config.yml /root/ClusterMaster_Backup/config_backup.yml && \\"
@@ -24,7 +24,7 @@ generate_simple_client_config_install_command() {
     echo "cat << 'EOF' > /root/ceremonyclient/node/.config/config.yml"
     echo "$config_content"
     echo "EOF"
-    echo "echo 'config.yml successfully installed at /root/ceremonyclient/node/.config/config.yml'"
+    echo "echo 'config.yml successfully installed at /root/ceremonyclient/node/.config/config.yml'"'\e[0m'
     echo "#######################👆👆 END - DONT COPY THIS LINE 👆👆######################"
     echo "##################################################################################"
 }
