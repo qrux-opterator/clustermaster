@@ -182,38 +182,35 @@ backup_and_setconfig() {
     # Read the content of config_block.txt
     config_block=$(cat "$CONFIG_BLOCK_FILE")
 
-    # Print debug information
-    echo "DEBUG: Contents of config_block.txt:"
-    echo "$config_block"
-    
     # Ensure correct formatting for newlines
     data_worker_multiaddrs_block="  dataWorkerMultiaddrs: [\n${config_block}\n  ]"
-    
-    # DEBUG: Show what we are trying to replace
-    echo "DEBUG: Trying to replace dataWorkerMultiaddrs in $ALTERED_CONFIG_FILE"
 
-    # DEBUG: Print the first 10 lines of the original file before changes
-    echo "DEBUG: Showing first 10 lines of $BACKUP_CONFIG_FILE before changes:"
-    head -n 10 "$BACKUP_CONFIG_FILE"
+    # Check if dataWorkerMultiaddrs exists in the file
+    if grep -q "dataWorkerMultiaddrs:" "$BACKUP_CONFIG_FILE"; then
+        echo "DEBUG: dataWorkerMultiaddrs block exists, replacing it."
+        # Use awk to replace the block
+        awk -v new_block="$data_worker_multiaddrs_block" '
+            BEGIN { found = 0 }
+            /dataWorkerMultiaddrs:/ { found = 1 }
+            found && /\]/ { found = 0; print new_block; next }
+            { print }
+        ' "$BACKUP_CONFIG_FILE" > "$ALTERED_CONFIG_FILE"
+    else
+        echo "DEBUG: dataWorkerMultiaddrs block does not exist, adding it under 'engine:'."
+        # Insert the block under 'engine:'
+        awk -v new_block="$data_worker_multiaddrs_block" '
+            /engine:/ { print; print new_block; next }
+            { print }
+        ' "$BACKUP_CONFIG_FILE" > "$ALTERED_CONFIG_FILE"
+    fi
 
-    # DEBUG: Log what the new block looks like before insertion
-    echo "DEBUG: The new block that will be inserted:"
-    echo "$data_worker_multiaddrs_block"
-
-    # Use awk to replace the block
-    awk -v new_block="$data_worker_multiaddrs_block" '
-        BEGIN { found = 0 }
-        /dataWorkerMultiaddrs:/ { print "DEBUG: Found dataWorkerMultiaddrs"; found = 1 }
-        found && /\]/ { found = 0; print new_block; next }
-        { print }
-    ' "$BACKUP_CONFIG_FILE" > "$ALTERED_CONFIG_FILE"
-
-    # DEBUG: Show what the modified file looks like after awk
-    echo "DEBUG: Showing the relevant section of the altered $ALTERED_CONFIG_FILE after awk:"
-    sed -n '/dataWorkerMultiaddrs:/,/provingKeyId/p' "$ALTERED_CONFIG_FILE"
+    # Minimal debug: print the section containing dataWorkerMultiaddrs
+    echo "DEBUG: Showing the relevant section of the altered $ALTERED_CONFIG_FILE:"
+    sed -n '/engine:/,/provingKeyId/p' "$ALTERED_CONFIG_FILE"
 
     echo "Backup completed and config.yml altered with new IP block."
 }
+
 
 
 
