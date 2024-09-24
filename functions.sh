@@ -13,7 +13,8 @@ generate_simple_client_config_install_command() {
 
     # Generate the one-liner to be run on the client machine
     echo "##################################################################################"
-    echo "################ 👇COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"'\e[34m'
+    echo "################👇 COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
+    echo -e "\e[34m"
     echo "mkdir -p /root/ClusterMaster_Backup && \\"
     echo "if [ -f /root/ceremonyclient/node/.config/config.yml ]; then \\"
     echo "  mv /root/ceremonyclient/node/.config/config.yml /root/ClusterMaster_Backup/config_backup.yml && \\"
@@ -24,8 +25,9 @@ generate_simple_client_config_install_command() {
     echo "cat << 'EOF' > /root/ceremonyclient/node/.config/config.yml"
     echo "$config_content"
     echo "EOF"
-    echo "echo 'config.yml successfully installed at /root/ceremonyclient/node/.config/config.yml'"'\e[0m'
-    echo "#######################👆👆 END - DONT COPY THIS LINE 👆👆######################"
+    echo "echo 'config.yml successfully installed at /root/ceremonyclient/node/.config/config.yml'"
+    echo -e "\e[0m"
+    echo "#######################👆  END - DONT COPY THIS LINE  👆######################"
     echo "##################################################################################"
 }
 
@@ -109,7 +111,8 @@ create_client_installers() {
     end_port=$((start_port + selected_workers))
 
     # Create the one-liner with $SERVICE_FILE, firewall commands, and the dynamic port range
-    echo "######## COPY THIS COMMAND AND RUN ON CLIENT MACHINE ########"
+    echo "################👇  COPY THIS COMMAND AND RUN ON CLIENT MACHINE  👇################"
+    echo -e "\e[34m"
     echo "SERVICE_FILE=/etc/systemd/system/para.service && \\"
     echo "curl -s https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/install_service | sudo bash && \\"
     echo "sudo sed -i 's|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* 1.4.21.1|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers 1.4.21.1|' \$SERVICE_FILE && \\"
@@ -125,6 +128,9 @@ create_client_installers() {
     echo "curl -s -o /root/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
     echo "if [ -f /root/clustermaster.bash ]; then chmod +x /root/clustermaster.bash && /root/clustermaster.bash; else echo 'Failed to download clustermaster.bash'; fi && \\"
     echo "echo \"New ExecStart line: ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers 1.4.21.1\""
+    echo -e "\e[0m"
+    echo "#######################👆  END - DONT COPY THIS LINE  👆########################"
+
 }
 
 # Function to create the IP-Block for config
