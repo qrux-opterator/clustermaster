@@ -1,32 +1,36 @@
 generate_simple_client_config_install_command() {
-     MASTER_CONFIG_FILE="/root/MasterCluster_BackupFiles/config.yml"
-     if [ ! -f "$MASTER_CONFIG_FILE" ]; then 
+    MASTER_CONFIG_FILE="/root/MasterCluster_BackupFiles/config.yml"
+    
+    if [ ! -f "$MASTER_CONFIG_FILE" ]; then 
         echo "Master config file not found at $MASTER_CONFIG_FILE"
         return 
-     fi
+    fi
 
-     config_content=$(cat "$MASTER_CONFIG_FILE")
-     
-     # Generate the one-liner to be run on the client machine
-     echo "##################################################################################"
-     echo "################👇 COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
-     echo -e "\e[34m"
-     echo "mkdir -p /root/ClusterMaster_Backup && \\"
-     echo "[ -f /root/ceremonyclient/node/.config/config.yml ] && \\"
-     echo "mv /root/ceremonyclient/node/.config/config.yml /root/ClusterMaster_Backup/config_backup.yml && \\"
-     echo "echo 'Backup created at /root/ClusterMaster_Backup/config_backup.yml' || \\"
-     echo "echo 'No existing config.yml found, proceeding with installation' && \\"
-     echo "echo \"$config_content\" > /root/ceremonyclient/node/.config/config.yml && \\"
-     echo "[ -f /root/ceremonyclient/node/.config/config.yml ] && \\"
-     echo "echo 'config.yml successfully installed' || \\"
-     echo "{ echo 'Failed to install config.yml!'; exit 1; } && \\"
-     echo "[ -f /root/clustermaster.bash ] && /root/clustermaster.bash && \\"
-     echo "echo 'Installation Complete! You can start your Slave now, and your Master after it is listening.' || \\"
-     echo "echo 'Make sure you run the first Client Installer! clustermaster.bash was not found!'"
-     echo -e "\e[0m"
-     echo "#######################👆  END - DONT COPY THIS LINE  👆######################"
-     echo "##################################################################################"
+    config_content=$(cat "$MASTER_CONFIG_FILE")
+
+    # Generate the one-liner to be run on the client machine
+    echo "##################################################################################"
+    echo "################👇 COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
+    echo -e "\e[34m"
+    echo "mkdir -p /root/ClusterMaster_Backup && \\"
+    echo "[ -f /root/ceremonyclient/node/.config/config.yml ] && \\"
+    echo "mv /root/ceremonyclient/node/.config/config.yml /root/ClusterMaster_Backup/config_backup.yml && \\"
+    echo "echo 'Backup created at /root/ClusterMaster_Backup/config_backup.yml' || \\"
+    echo "echo 'No existing config.yml found, proceeding with installation' && \\"
+    echo "cat <<'EOF' > /root/ceremonyclient/node/.config/config.yml"
+    echo "$config_content"
+    echo "EOF && \\"
+    echo "[ -f /root/ceremonyclient/node/.config/config.yml ] && \\"
+    echo "echo 'config.yml successfully installed' || \\"
+    echo "{ echo 'Failed to install config.yml!'; exit 1; } && \\"
+    echo "[ -f /root/clustermaster.bash ] && /root/clustermaster.bash && \\"
+    echo "echo 'Installation Complete! You can start your Slave now, and your Master after it is listening.' || \\"
+    echo "echo 'Make sure you run the first Client Installer! clustermaster.bash was not found!'"
+    echo -e "\e[0m"
+    echo "#######################👆  END - DONT COPY THIS LINE  👆######################"
+    echo "##################################################################################"
 }
+
 
 set_cluster() {
     echo -e "Enter your cluster details (IP and threads per IP), one per line."
