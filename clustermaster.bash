@@ -5,12 +5,24 @@ SOURCE_CONFIG_FILE="/root/ceremonyclient/node/.config/config.yml"
 BACKUP_DIR="/root/MasterCluster_BackupFiles"
 SERVICE_FILE="/etc/systemd/system/para.service"
 
+# Function to install functions from GitHub if they're not present
+install_functions_from_github() {
+    echo "Downloading functions from GitHub..."
+    curl -o /root/functions.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/functions.sh
+    if [ -f /root/functions.sh ]; then
+        echo "Functions successfully installed."
+        source /root/functions.sh
+    else
+        echo "Failed to download functions. Please check your connection."
+        exit 1
+    fi
+}
+
 # Source the functions from /root/functions.sh if they exist
 if [ -f /root/functions.sh ]; then
     source /root/functions.sh
 else
-    echo "Functions file not found!"
-    exit 1
+    echo "Functions file not found! Please install the functions first."
 fi
 
 # Function for QuickSetup (runs steps 3-7 sequentially)
@@ -76,7 +88,7 @@ while true; do
     read -p "Choose an option: " main_option
     
     case $main_option in
-        1) install_functions_from_github ;;  # Assuming this is a defined function
+        1) install_functions_from_github ;;  # Download functions if missing
         2) set_cluster ;;  # Function to set up the cluster
         3) quick_setup ;;  # Runs the QuickSetup function
         4) generate_client_script_install_oneliner ;;  # Calls the client script install generator
