@@ -11,24 +11,15 @@ generate_simple_client_config_install_command() {
     # Read the content of the master config file
     config_content=$(cat "$MASTER_CONFIG_FILE")
 
-    # Generate the one-liner to be run on the client machine
+generate_simple_client_config_install_command() {
+    MASTER_CONFIG_FILE="/root/MasterCluster_BackupFiles/config.yml"; if [ ! -f "$MASTER_CONFIG_FILE" ]; then echo "Master config file not found at $MASTER_CONFIG_FILE"; return; fi; config_content=$(cat "$MASTER_CONFIG_FILE")
     echo "##################################################################################"
     echo "################👇 COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
-    echo -e "\e[34m"
-    echo "mkdir -p /root/ClusterMaster_Backup && \\"
-    echo "if [ -f /root/ceremonyclient/node/.config/config.yml ]; then \\"
-    echo "  mv /root/ceremonyclient/node/.config/config.yml /root/ClusterMaster_Backup/config_backup.yml && \\"
-    echo "  echo 'Backup of config.yml created at /root/ClusterMaster_Backup/config_backup.yml'; \\"
-    echo "else \\"
-    echo "  echo 'No existing config.yml found, proceeding with installation'; \\"
-    echo "fi && \\"
-    echo "cat << 'EOF' > /root/ceremonyclient/node/.config/config.yml"
-    echo "$config_content"
-    echo "EOF"
-    echo "echo 'config.yml successfully installed at /root/ceremonyclient/node/.config/config.yml'"
+    echo -e "\e[34m mkdir -p /root/ClusterMaster_Backup && [ -f /root/ceremonyclient/node/.config/config.yml ] && mv /root/ceremonyclient/node/.config/config.yml /root/ClusterMaster_Backup/config_backup.yml && echo 'Backup created at /root/ClusterMaster_Backup/config_backup.yml' || echo 'No existing config.yml found, proceeding with installation' && cat << 'EOF' > /root/ceremonyclient/node/.config/config.yml $config_content EOF && [ -f /root/ceremonyclient/node/.config/config.yml ] && echo 'config.yml successfully installed' || { echo 'Failed to install config.yml!'; exit 1; } && [ -f /root/clustermaster.bash ] && /root/clustermaster.bash && echo 'Installation Complete! You can start your Slave now, and your Master after it is listening.' || echo 'Make sure you run the first Client Installer! clustermaster.bash was not found!'"
     echo -e "\e[0m"
     echo "#######################👆  END - DONT COPY THIS LINE  👆######################"
     echo "##################################################################################"
+
 }
 
 
