@@ -1,5 +1,5 @@
 generate_simple_client_config_install_command() {
-    MASTER_CONFIG_FILE="/root/MasterCluster_BackupFiles/config.yml"
+        MASTER_CONFIG_FILE="/root/MasterCluster_BackupFiles/config.yml"
 
     # Check if the master config exists
     if [ ! -f "$MASTER_CONFIG_FILE" ]; then
@@ -24,8 +24,8 @@ generate_simple_client_config_install_command() {
     echo "cat << 'EOF' > /root/ceremonyclient/node/.config/config.yml"
     echo "$config_content"
     echo "EOF"
-    echo "echo 'config.yml successfully installed at /root/ceremonyclient/node/.config/config.yml'"
-    echo "echo'💻 You can run your Slave now with clustermaster.bash! 👏'"
+    echo "echo 'config.yml successfully installed at /root/ceremonyclient/node/.config/config.yml' && \\"
+    echo "echo '💻 You can now run your Slave with clustermaster.bash! 👏' && \\"
     echo "/root/clustermaster.bash"
     echo -e "\e[0m"
     echo "#######################👆  END - DONT COPY THIS LINE  👆######################"
