@@ -312,12 +312,26 @@ setup_master() {
     # Define variables
     SETTINGS_FILE="/root/cm_settings.txt"  # Path to the cluster settings
     SERVICE_FILE="/etc/systemd/system/para.service"  # Path to the para service file
+    PARA_SCRIPT_PATH="/root/ceremonyclient/node/para.sh"  # Path to the para.sh script
 
     # Step 1: Run the install_service script from GitHub
     echo "Running the install_service script..."
     curl -s https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/install_service | sudo bash
 
-    # Step 2: Read the first line of cm_settings.txt to extract the second value (thread count)
+    # Step 2: Download para.sh from GitHub and overwrite the existing file
+    echo "Downloading para.sh script..."
+    curl -s -o "$PARA_SCRIPT_PATH" https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/para.sh
+
+    # Verify if the script was downloaded successfully
+    if [ -f "$PARA_SCRIPT_PATH" ]; then
+        echo "para.sh script downloaded successfully to $PARA_SCRIPT_PATH."
+        chmod +x "$PARA_SCRIPT_PATH"  # Make the script executable
+    else
+        echo "Error: Failed to download para.sh script."
+        return 1  # Return 1 to indicate failure
+    fi
+
+    # Step 3: Read the first line of cm_settings.txt to extract the second value (thread count)
     if [ ! -f "$SETTINGS_FILE" ]; then
         echo "Error: $SETTINGS_FILE not found."
         return 1  # Return 1 to indicate failure
@@ -330,7 +344,7 @@ setup_master() {
 
     echo "Master IP: $master_ip, Thread Count: $thread_count"
 
-    # Step 3: Modify the ExecStart line in the service file
+    # Step 4: Modify the ExecStart line in the service file
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "Error: $SERVICE_FILE not found."
         return 1  # Return 1 to indicate failure
@@ -347,7 +361,8 @@ setup_master() {
     modified_execstart=$(grep '^ExecStart=' "$SERVICE_FILE")
     echo "Modified ExecStart line: $modified_execstart"
 
-    # Step 4: Reload the systemd daemon to apply changes
+    # Step 5: Reload the systemd daemon to apply changes
     sudo systemctl daemon-reload
     echo "Service file updated and systemd daemon reloaded."
 }
+
