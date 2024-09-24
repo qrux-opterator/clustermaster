@@ -309,6 +309,10 @@ replace_config_in_ceremonyclient() {
 setup_master() {
     echo "Setting up the master node..."
 
+    # Define variables
+    SETTINGS_FILE="/root/cm_settings.txt"  # Path to the cluster settings
+    SERVICE_FILE="/etc/systemd/system/para.service"  # Path to the para service file
+
     # Step 1: Run the install_service script from GitHub
     echo "Running the install_service script..."
     curl -s https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/install_service | sudo bash
@@ -316,10 +320,10 @@ setup_master() {
     # Step 2: Read the first line of cm_settings.txt to extract the second value (thread count)
     if [ ! -f "$SETTINGS_FILE" ]; then
         echo "Error: $SETTINGS_FILE not found."
-        return
+        return 1  # Return 1 to indicate failure
     fi
 
-    # Read the first line and extract the second value (thread count)
+    # Read the first line and extract the IP and thread count
     first_line=$(head -n 1 "$SETTINGS_FILE")
     master_ip=$(echo "$first_line" | awk '{print $1}')
     thread_count=$(echo "$first_line" | awk '{print $2}')
@@ -329,7 +333,7 @@ setup_master() {
     # Step 3: Modify the ExecStart line in the service file
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "Error: $SERVICE_FILE not found."
-        return
+        return 1  # Return 1 to indicate failure
     fi
 
     # Find and echo the original ExecStart line
