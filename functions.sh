@@ -55,6 +55,9 @@ set_cluster() {
     echo "Cluster settings saved to $SETTINGS_FILE."
 }
 create_client_installers() {
+    # Path to the settings file on the master
+    SETTINGS_FILE="/root/cm_settings.txt"
+    
     # Read the IPs and workers from cm_settings.txt into an array
     mapfile -t settings < "$SETTINGS_FILE"
 
@@ -97,15 +100,24 @@ create_client_installers() {
     done
     total_workers=$((total_workers - 1))
 
-    # Create the one-liner
-    echo "######## COPY THIS COMMAND AND RUN ON CLIENT MACHINE ########"
+    # Create the one-liner with $SERVICE_FILE variable and output messages
+    echo "############### COPY THIS COMMAND AND RUN ON CLIENT MACHINE ###############"
+    echo "SERVICE_FILE=/etc/systemd/system/para.service && \\"
     echo "curl -s https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/install_service | sudo bash && \\"
-    echo "sudo sed -i 's|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* 1.4.21.1|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers 1.4.21.1|' /etc/systemd/system/para.service && \\"
+    echo "sudo sed -i 's|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* 1.4.21.1|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers 1.4.21.1|' \$SERVICE_FILE && \\"
     echo "sudo systemctl daemon-reload && \\"
+    echo "echo 'para.service has been updated with the new ExecStart line:' && \\"
+    echo "grep 'ExecStart=' \$SERVICE_FILE && \\"
     echo "curl -s -o /root/ceremonyclient/node/para.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/para.sh && \\"
     echo "if [ -f /root/ceremonyclient/node/para.sh ]; then echo 'para.sh created'; else echo 'Failed to create para.sh'; fi && \\"
+    echo "echo 'Running clustermaster.bash...' && \\"
+    echo "curl -s -o /root/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
+    echo "if [ -f /root/clustermaster.bash ]; then chmod +x /root/clustermaster.bash && /root/clustermaster.bash; else echo 'Failed to download clustermaster.bash'; fi && \\"
     echo "echo \"New ExecStart line: ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers 1.4.21.1\""
+    echo "###################### END - DONT INCLUDE THIS LINE ######################"
+
 }
+
 # Function to create the IP-Block for config
 create_ip_block() {
     if [ ! -f "$SETTINGS_FILE" ]; then
