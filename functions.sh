@@ -25,6 +25,58 @@ set_cluster() {
     
     echo "Cluster settings saved to $SETTINGS_FILE."
 }
+create_client_installers() {
+    # Read the IPs and workers from cm_settings.txt into an array
+    mapfile -t settings < "$SETTINGS_FILE"
+
+    echo "Cluster Overview:"
+    echo "------------------------------------"
+
+    # Display all IPs and workers but mark the first one (master) as not selectable
+    for i in "${!settings[@]}"; do
+        ip=$(echo "${settings[$i]}" | awk '{print $1}')
+        workers=$(echo "${settings[$i]}" | awk '{print $2}')
+        if [ $i -eq 0 ]; then
+            echo "$((i+1)). $ip (Master, $workers workers)"
+        else
+            echo "$((i+1)). $ip ($workers workers)"
+        fi
+    done
+
+    echo "------------------------------------"
+    echo "Choose a client machine to create an installer for (Master cannot be selected):"
+    
+    # Read user selection (must be greater than 1, since Master is index 0)
+    while true; do
+        read -p "Enter the number of the client machine: " choice
+        if ((choice > 1 && choice <= ${#settings[@]})); then
+            break
+        else
+            echo "Invalid selection. Please choose a valid client machine."
+        fi
+    done
+
+    # Get the selected client IP and workers
+    selected_ip=$(echo "${settings[$((choice-1))]}" | awk '{print $1}')
+    selected_workers=$(echo "${settings[$((choice-1))]}" | awk '{print $2}')
+
+    # Calculate total workers for all preceding machines and subtract 1
+    total_workers=0
+    for ((j=0; j<choice-1; j++)); do
+        prev_workers=$(echo "${settings[$j]}" | awk '{print $2}')
+        total_workers=$((total_workers + prev_workers))
+    done
+    total_workers=$((total_workers - 1))
+
+    # Create the one-liner
+    echo "######## COPY THIS COMMAND AND RUN ON CLIENT MACHINE ########"
+    echo "curl -s https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/install_service | sudo bash && \\"
+    echo "sudo sed -i 's|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* 1.4.21.1|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers 1.4.21.1|' /etc/systemd/system/para.service && \\"
+    echo "sudo systemctl daemon-reload && \\"
+    echo "curl -s -o /root/ceremonyclient/node/para.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/para.sh && \\"
+    echo "if [ -f /root/ceremonyclient/node/para.sh ]; then echo 'para.sh created'; else echo 'Failed to create para.sh'; fi && \\"
+    echo "echo \"New ExecStart line: ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers 1.4.21.1\""
+}
 # Function to create the IP-Block for config
 create_ip_block() {
     if [ ! -f "$SETTINGS_FILE" ]; then
