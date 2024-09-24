@@ -146,6 +146,7 @@ create_ip_block() {
     # Define the necessary variables
     SETTINGS_FILE="/root/cm_settings.txt"
     CONFIG_BLOCK_FILE="/root/config_block.txt"
+    BASE_PORT=40000  # Starting port number
 
     # Check if the settings file exists
     if [ ! -f "$SETTINGS_FILE" ]; then
@@ -159,6 +160,9 @@ create_ip_block() {
     # Initialize the config block variable
     config_block=""
 
+    # Initialize the current port number
+    current_port=$BASE_PORT
+
     # Loop through each IP and its corresponding worker count
     for i in "${!settings[@]}"; do
         ip=$(echo "${settings[$i]}" | awk '{print $1}')
@@ -170,8 +174,9 @@ create_ip_block() {
         fi
         
         # Generate the config block lines for each worker/thread
-        for port in $(seq 1 "$workers"); do
-            config_block+="    '/ip4/$ip/tcp/4000$port',"$'\n'
+        for ((port_index=1; port_index<=workers; port_index++)); do
+            config_block+="    '/ip4/$ip/tcp/$current_port',"$'\n'
+            current_port=$((current_port + 1))  # Increment port number for each worker
         done
     done
 
@@ -183,6 +188,7 @@ create_ip_block() {
 
     echo "Config block saved to $CONFIG_BLOCK_FILE."
 }
+
 
 
 # Function to back up and set the config
