@@ -146,6 +146,13 @@ create_ip_block() {
 
 # Function to back up and set the config
 backup_and_setconfig() {
+    # Define paths for the source and backup config files
+    SOURCE_CONFIG_FILE="/root/ceremonyclient/node/.config/config.yml"
+    BACKUP_DIR="/root/MasterCluster_BackupFiles"
+    BACKUP_CONFIG_FILE="$BACKUP_DIR/configbackup.yml"
+    ALTERED_CONFIG_FILE="$BACKUP_DIR/config.yml"
+    CONFIG_BLOCK_FILE="/root/config_block.txt"
+
     echo "Backing up and setting config..."
 
     # Check if the source config file exists
