@@ -8,7 +8,7 @@ generate_simple_client_config_install_command() {
      echo "#######################👆  END - DONT COPY THIS LINE  👆######################"
      echo "##################################################################################"
     
- }
+}
 
 set_cluster() {
     echo -e "Enter your cluster details (IP and threads per IP), one per line."
