@@ -32,8 +32,6 @@ generate_simple_client_config_install_command() {
     echo "##################################################################################"
 }
 
-
-
 set_cluster() {
     echo -e "Enter your cluster details (IP and threads per IP), one per line."
     set +H
@@ -189,8 +187,6 @@ create_ip_block() {
     echo "Config block saved to $CONFIG_BLOCK_FILE."
 }
 
-
-
 # Function to back up and set the config
 backup_and_setconfig() {
     echo "Backing up and setting config..."
@@ -214,12 +210,10 @@ backup_and_setconfig() {
         mkdir -p "$BACKUP_DIR"
     fi
 
-    # Copy the original config file to the backup location as configbackup.yml
+    # Backup the original config file
     cp "$SOURCE_CONFIG_FILE" "$BACKUP_CONFIG_FILE"
-    
-    # Copy the original config file to the backup location as config.yml (this will be altered)
     cp "$SOURCE_CONFIG_FILE" "$ALTERED_CONFIG_FILE"
-    
+
     # Check if the config_block.txt exists
     if [ ! -f "$CONFIG_BLOCK_FILE" ]; then
         echo "Config block file $CONFIG_BLOCK_FILE not found! Please create the IP block first."
@@ -232,23 +226,25 @@ backup_and_setconfig() {
     # Ensure correct formatting for newlines
     data_worker_multiaddrs_block="  dataWorkerMultiaddrs: [\n${config_block}\n  ]"
 
-    # Check if dataWorkerMultiaddrs exists in the file
-    if grep -q "dataWorkerMultiaddrs:" "$BACKUP_CONFIG_FILE"; then
-        echo "DEBUG: dataWorkerMultiaddrs block exists, replacing it."
-        # Use awk to replace the block
-        awk -v new_block="$data_worker_multiaddrs_block" '
-            BEGIN { found = 0 }
-            /dataWorkerMultiaddrs:/ { found = 1 }
-            found && /\]/ { found = 0; print new_block; next }
-            { print }
-        ' "$BACKUP_CONFIG_FILE" > "$ALTERED_CONFIG_FILE"
-    else
-        echo "DEBUG: dataWorkerMultiaddrs block does not exist, adding it under 'engine:'."
-        # Insert the block under 'engine:'
+    # Remove any existing dataWorkerMultiaddrs block
+    echo "DEBUG: Removing any existing dataWorkerMultiaddrs block..."
+    awk '
+        BEGIN { inside_block = 0 }
+        /dataWorkerMultiaddrs:/ { inside_block = 1 }
+        inside_block && /\]/ { inside_block = 0; next }
+        !inside_block { print }
+    ' "$ALTERED_CONFIG_FILE" > "$ALTERED_CONFIG_FILE.tmp" && mv "$ALTERED_CONFIG_FILE.tmp" "$ALTERED_CONFIG_FILE"
+
+    # Add the new dataWorkerMultiaddrs block under the 'engine:' section
+    if grep -q "engine:" "$ALTERED_CONFIG_FILE"; then
+        echo "DEBUG: Adding the new dataWorkerMultiaddrs block under 'engine:'."
         awk -v new_block="$data_worker_multiaddrs_block" '
             /engine:/ { print; print new_block; next }
             { print }
-        ' "$BACKUP_CONFIG_FILE" > "$ALTERED_CONFIG_FILE"
+        ' "$ALTERED_CONFIG_FILE" > "$ALTERED_CONFIG_FILE.tmp" && mv "$ALTERED_CONFIG_FILE.tmp" "$ALTERED_CONFIG_FILE"
+    else
+        echo "ERROR: 'engine:' section not found. Could not insert dataWorkerMultiaddrs block."
+        return 1
     fi
 
     # Minimal debug: print the section containing dataWorkerMultiaddrs
@@ -257,9 +253,6 @@ backup_and_setconfig() {
 
     echo "Backup completed and config.yml altered with new IP block."
 }
-
-
-
 
 # Function to stop node tasks and services
 stop_node_tasks_and_services() {
