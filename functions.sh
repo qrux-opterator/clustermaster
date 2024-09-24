@@ -25,6 +25,43 @@ set_cluster() {
     
     echo "Cluster settings saved to $SETTINGS_FILE."
 }
+# Function to create the IP-Block for config
+create_ip_block() {
+    if [ ! -f "$SETTINGS_FILE" ]; then
+        echo "Settings file not found! Please set your cluster first."
+        return
+    fi
+
+    # Read the IPs and threads (workers) from cm_settings.txt into an array
+    mapfile -t settings < "$SETTINGS_FILE"
+
+    # Initialize the config block variable
+    config_block=""
+
+    # Loop through each IP and its corresponding worker count
+    for i in "${!settings[@]}"; do
+        ip=$(echo "${settings[$i]}" | awk '{print $1}')
+        workers=$(echo "${settings[$i]}" | awk '{print $2}')
+        
+        # If this is the first IP, adjust the worker count by subtracting 1 for the first IP
+        if [ "$i" -eq 0 ]; then
+            workers=$((workers - 1))
+        fi
+        
+        # Generate the config block lines for each worker/thread
+        for port in $(seq 1 "$workers"); do
+            config_block+="    '/ip4/$ip/tcp/4000$port',"$'\n'
+        done
+    done
+
+    # Remove the trailing comma from the last entry
+    config_block=$(echo "$config_block" | sed '$s/,$//')
+
+    # Write the config block to the config_block.txt file
+    echo -n "$config_block" > "$CONFIG_BLOCK_FILE"
+
+    echo "Config block saved to $CONFIG_BLOCK_FILE."
+}
 
 # Function to back up and set the config
 backup_and_setconfig() {
