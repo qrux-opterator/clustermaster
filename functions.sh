@@ -26,6 +26,7 @@ generate_simple_client_config_install_command() {
     echo "EOF"
     echo "echo 'config.yml successfully installed at /root/ceremonyclient/node/.config/config.yml'"
     echo -e "\e[0m"
+    echo "💻 You can run your Slave now with clustermaster.bash! 👏"
     echo "#######################👆  END - DONT COPY THIS LINE  👆######################"
     echo "##################################################################################"
 }
