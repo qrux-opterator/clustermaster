@@ -132,10 +132,11 @@ create_client_installers() {
     echo "echo 'Firewall rules updated for ports 22, 443, 8336, and $start_port to $end_port/tcp' && \\"
     echo "echo 'Running clustermaster.bash...' && \\"
     echo "curl -s -o /root/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
-    echo "if [ -f /root/clustermaster.bash ]; then chmod +x /root/clustermaster.bash && /root/clustermaster.bash; else echo 'Failed to download clustermaster.bash'; fi && \\"
-    echo "echo \"New ExecStart line: ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers 1.4.21.1\""
+    echo "if [ -f /root/clustermaster.bash ]; then chmod +x /root/clustermaster.bash; echo 'clustermaster.bash downloaded and made executable'; else echo 'Failed to download clustermaster.bash'; fi && \\"
+    echo "if [ -x /root/clustermaster.bash ]; then /root/clustermaster.bash; else echo 'clustermaster.bash is not executable'; fi"
     echo -e "\e[0m"
     echo "#######################👆  END - DONT COPY THIS LINE  👆########################"
+
 }
 
 # Function to create the IP-Block for config
