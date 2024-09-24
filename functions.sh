@@ -34,9 +34,13 @@ generate_simple_client_config_install_command() {
 
 set_cluster() {
     echo "Enter your cluster details (IP and threads per IP), one per line."
-    echo "Format: <IP> <Threads>"
-    echo "When you are done, press Enter on an empty line."
-
+    echo "Format: IP Threads - example:"
+    echo "192.168.0.1 32"
+    echo "192.168.0.2 32"
+    echo "192.168.0.3 48"
+    echo -e "\e[32m"
+    echo "When you are done, press Enter on an empty line!"
+    echo -e "\e[0m"
     # Initialize an empty variable to store the input
     user_input=""
 
