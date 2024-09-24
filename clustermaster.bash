@@ -61,40 +61,87 @@ advanced_setup() {
     done
 }
 
-# Function placeholder for generating the client-script install one-liner
+# Function to generate the client-script install one-liner
 generate_client_script_install_oneliner() {
     echo "Generating Client-Script Install One-Liner..."
     create_client_installers
 }
 
-# Function placeholder for generating the client-config install one-liner
+# Function to generate the client-config install one-liner
 generate_client_config_install_oneliner() {
     echo "Generating Client-Config Install One-Liner..."
-    # Assuming you have a function to generate the config install command
     generate_client_config_install_command
 }
 
+# Menu for Install Cluster
+install_cluster() {
+    while true; do
+        echo "Install Cluster Menu:"
+        echo "1. Download Functions"
+        echo "2. Input IPs and Threads"
+        echo "3. QuickSetup"
+        echo "4. Generate Client-Script Install-1liner"
+        echo "5. Generate Client-Config Install-1liner"
+        echo "6. AdvancedSetup [...]"
+        echo "7. Back to Main Menu"
+        
+        read -p "Choose an option: " cluster_option
+        
+        case $cluster_option in
+            1) install_functions_from_github ;;  # Download functions
+            2) set_cluster ;;  # Input IPs and Threads (renamed)
+            3) quick_setup ;;  # Run the QuickSetup function
+            4) generate_client_script_install_oneliner ;;  # Client script installer generator
+            5) generate_simple_client_config_install_command ;;  # Client config installer generator
+            6) advanced_setup ;;  # Advanced setup submenu
+            7) break ;;  # Go back to the main menu
+            *) echo "Invalid option. Please choose again." ;;
+        esac
+    done
+}
+
+# Function to show logs
+show_logs() {
+    echo "Showing logs for para.service..."
+    journalctl -u para.service --no-hostname -f
+}
+
+# Function to start or restart the node
+start_or_restart_node() {
+    echo "Starting or Restarting the para service..."
+    systemctl daemon-reload && service para restart
+    echo "Node started/restarted."
+}
+
+# Function to stop the node
+stop_node() {
+    echo "Stopping the para service..."
+    service para stop
+    echo "Node stopped."
+}
+
 # Main Menu
-while true; do
-    echo "Main Menu:"
-    echo "1. Install Functions"
-    echo "2. Set your Cluster"
-    echo "3. QuickSetup"
-    echo "4. Generate Client-Script Install-1liner"
-    echo "5. Generate Client-Config Install-1liner"
-    echo "6. AdvancedSetup [...]"
-    echo "7. Exit"
-    
-    read -p "Choose an option: " main_option
-    
-    case $main_option in
-        1) install_functions_from_github ;;  # Assuming this is a defined function
-        2) set_cluster ;;  # Function to set up the cluster
-        3) quick_setup ;;  # Runs the QuickSetup function
-        4) generate_client_script_install_oneliner ;;  # Calls the client script install generator
-        5) generate_simple_client_config_install_command ;;  # Fix: Calls the correct function for config install
-        6) advanced_setup ;;  # Shows the advanced setup submenu
-        7) exit 0 ;;  # Exit the script
-        *) echo "Invalid option. Please choose again." ;;
-    esac
-done
+main_menu() {
+    while true; do
+        echo "Main Menu:"
+        echo "1. Show Logs"
+        echo "2. Start / Restart Node"
+        echo "3. Stop Node"
+        echo "4. Install Cluster [...]"
+        echo "5. Exit"
+        
+        read -p "Choose an option: " main_option
+        
+        case $main_option in
+            1) show_logs ;;  # Show logs
+            2) start_or_restart_node ;;  # Start/Restart the node
+            3) stop_node ;;  # Stop the node
+            4) install_cluster ;;  # Install Cluster Menu
+            5) exit 0 ;;  # Exit the script
+            *) echo "Invalid option. Please choose again." ;;
+        esac
+    done
+}
+
+# Start the script with the main menu
+main_menu
