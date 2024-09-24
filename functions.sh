@@ -185,28 +185,36 @@ backup_and_setconfig() {
     # Print debug information
     echo "DEBUG: Contents of config_block.txt:"
     echo "$config_block"
-    echo "DEBUG: Replacing dataWorkerMultiaddrs block in config.yml..."
-
-    # Build the new dataWorkerMultiaddrs block with properly escaped newlines
+    
+    # Ensure correct formatting for newlines
     data_worker_multiaddrs_block="  dataWorkerMultiaddrs: [\n${config_block}\n  ]"
+    
+    # DEBUG: Show what we are trying to replace
+    echo "DEBUG: Trying to replace dataWorkerMultiaddrs in $ALTERED_CONFIG_FILE"
+
+    # DEBUG: Print the first 10 lines of the original file before changes
+    echo "DEBUG: Showing first 10 lines of $BACKUP_CONFIG_FILE before changes:"
+    head -n 10 "$BACKUP_CONFIG_FILE"
+
+    # DEBUG: Log what the new block looks like before insertion
+    echo "DEBUG: The new block that will be inserted:"
+    echo "$data_worker_multiaddrs_block"
 
     # Use awk to replace the block
     awk -v new_block="$data_worker_multiaddrs_block" '
         BEGIN { found = 0 }
-        /dataWorkerMultiaddrs:/ { found = 1 }
+        /dataWorkerMultiaddrs:/ { print "DEBUG: Found dataWorkerMultiaddrs"; found = 1 }
         found && /\]/ { found = 0; print new_block; next }
-        !found { print }
+        { print }
     ' "$BACKUP_CONFIG_FILE" > "$ALTERED_CONFIG_FILE"
 
-    # Debug: Print the altered config to see if the changes were applied
-    echo "DEBUG: Showing the relevant section of the altered config.yml:"
+    # DEBUG: Show what the modified file looks like after awk
+    echo "DEBUG: Showing the relevant section of the altered $ALTERED_CONFIG_FILE after awk:"
     sed -n '/dataWorkerMultiaddrs:/,/provingKeyId/p' "$ALTERED_CONFIG_FILE"
-
-    # Debug: Check if the awk command worked properly by comparing old and new
-    diff "$BACKUP_CONFIG_FILE" "$ALTERED_CONFIG_FILE"
 
     echo "Backup completed and config.yml altered with new IP block."
 }
+
 
 
 # Function to stop node tasks and services
