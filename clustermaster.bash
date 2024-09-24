@@ -1,175 +1,88 @@
 #!/bin/bash
 
-# Define the URL and local path for the functions file
-FUNCTIONS_URL="https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/functions.sh"
-FUNCTIONS_PATH="/root/functions.sh"
 SETTINGS_FILE="/root/cm_settings.txt"
-CONFIG_BLOCK_FILE="/root/config_block.txt"
+SOURCE_CONFIG_FILE="/root/ceremonyclient/node/.config/config.yml"
+BACKUP_DIR="/root/MasterCluster_BackupFiles"
+SERVICE_FILE="/etc/systemd/system/para.service"
 
-# Function to download and source the functions file
-download_and_source_functions() {
-    echo "Downloading functions from GitHub..."
-    if curl -s -o "$FUNCTIONS_PATH" "$FUNCTIONS_URL"; then
-        echo "Sourcing the functions..."
-        source "$FUNCTIONS_PATH"
-        echo "Functions sourced successfully from $FUNCTIONS_PATH."
-    else
-        echo "Failed to download functions from GitHub. Please check the URL or network connection."
-        exit 1
-    fi
-}
-
-# Source the functions file if it exists
-if [ -f "$FUNCTIONS_PATH" ]; then
-    source "$FUNCTIONS_PATH"
+# Source the functions from /root/functions.sh if they exist
+if [ -f /root/functions.sh ]; then
+    source /root/functions.sh
+else
+    echo "Functions file not found!"
+    exit 1
 fi
 
-# Function to show logs for para.service
-show_logs() {
-    echo "Showing logs for para.service..."
-    journalctl -u para.service --no-hostname -f
+# Function for QuickSetup (runs steps 3-7 sequentially)
+quick_setup() {
+    echo "Starting Quick Setup..."
+    create_ip_block
+    backup_and_setconfig
+    stop_node_tasks_and_services
+    replace_config_in_ceremonyclient
+    setup_master
+    echo "Quick Setup completed."
 }
 
-# Function to restart the para service
-restart_node() {
-    echo "Restarting para service..."
-    systemctl daemon-reload && service para restart && journalctl -u para.service --no-hostname -f
-}
-
-# Function to stop the para service and node-related processes
-stop_node() {
-    echo "Stopping para service and node-related processes..."
-    service para stop
-    pkill -f node-1.4.21.1-linux
-    echo "para service stopped and node processes killed."
-}
-
-# Placeholder function: Edit Start Command
-edit_start_command() {
-    echo "Editing start command... (Placeholder)"
-    # You can add the command editing functionality here
-}
-
-# Function to display install-related commands (nested menu)
-install_commands_menu() {
+# Function for AdvancedSetup (shows a submenu to run individual steps)
+advanced_setup() {
     while true; do
-        echo "Install Commands Menu:"
-        echo "1. Install Functions from GitHub"
-        echo "2. Set your Cluster (IP and Workers)"
-        echo "3. Create IP-Block for config"
-        echo "4. Backup and SetConfig"
-        echo "5. Stop Node Tasks and Services"
-        echo "6. Replace Config in ceremonyclient"
-        echo "7. Setup Master"
-        echo "8. Create Client Installers"
-        echo "9. Generate Client Config Install Command"
-        echo "10. Back to Main Menu"
+        echo "Advanced Setup Menu:"
+        echo "1. Create IP-Block for config"
+        echo "2. Backup and SetConfig"
+        echo "3. Stop Node Tasks and Services"
+        echo "4. Replace Config in ceremonyclient"
+        echo "5. Setup Master"
+        echo "6. Back to Main Menu"
         
-        read -p "Choose an option: " install_choice
-        case $install_choice in
-            1)
-                download_and_source_functions
-                ;;
-            2)
-                if declare -f set_cluster > /dev/null; then
-                    set_cluster
-                else
-                    echo "Invalid option."
-                fi
-                ;;
-            3)
-                if declare -f create_ip_block > /dev/null; then
-                    create_ip_block
-                else
-                    echo "Invalid option."
-                fi
-                ;;
-            4)
-                if declare -f backup_and_setconfig > /dev/null; then
-                    backup_and_setconfig
-                else
-                    echo "Invalid option."
-                fi
-                ;;
-            5)
-                if declare -f stop_node_tasks_and_services > /dev/null; then
-                    stop_node_tasks_and_services
-                else
-                    echo "Invalid option."
-                fi
-                ;;
-            6)
-                if declare -f replace_config_in_ceremonyclient > /dev/null; then
-                    replace_config_in_ceremonyclient
-                else
-                    echo "Invalid option."
-                fi
-                ;;
-            7)
-                if declare -f setup_master > /dev/null; then
-                    setup_master
-                else
-                    echo "Invalid option."
-                fi
-                ;;
-            8)
-                if declare -f create_client_installers > /dev/null; then
-                    create_client_installers
-                else
-                    echo "Invalid option."
-                fi
-                ;;
-            9)
-                if declare -f generate_simple_client_config_install_command > /dev/null; then
-                    generate_simple_client_config_install_command
-                else
-                    echo "Invalid option."
-                fi
-                ;;
-            10)
-                return
-                ;;
-            *)
-                echo "Invalid option, please try again."
-                ;;
+        read -p "Choose an option: " option
+
+        case $option in
+            1) create_ip_block ;;
+            2) backup_and_setconfig ;;
+            3) stop_node_tasks_and_services ;;
+            4) replace_config_in_ceremonyclient ;;
+            5) setup_master ;;
+            6) break ;;
+            *) echo "Invalid option. Please choose again." ;;
         esac
     done
 }
 
-# Main program loop (Default menu)
+# Function placeholder for generating the client-script install one-liner
+generate_client_script_install_oneliner() {
+    echo "Generating Client-Script Install One-Liner..."
+    create_client_installers
+}
+
+# Function placeholder for generating the client-config install one-liner
+generate_client_config_install_oneliner() {
+    echo "Generating Client-Config Install One-Liner..."
+    # Assuming you have a function to generate the config install command
+    generate_client_config_install_command
+}
+
+# Main Menu
 while true; do
-    echo "1. Show Logs"
-    echo "2. Restart Node"
-    echo "3. Stop Node"
-    echo "4. Edit Start Command"
-    echo "_________________________"
-    echo "5. Install Commands"
-    echo "6. Exit"
-
-    read -p "Choose an option: " choice
-
-    case $choice in
-        1)
-            show_logs
-            ;;
-        2)
-            restart_node
-            ;;
-        3)
-            stop_node
-            ;;
-        4)
-            edit_start_command
-            ;;
-        5)
-            install_commands_menu
-            ;;
-        6)
-            echo "Exiting..."
-            exit 0
-            ;;
-        *)
-            echo "Invalid option, please try again."
-            ;;
+    echo "Main Menu:"
+    echo "1. Install Functions"
+    echo "2. Set your Cluster"
+    echo "3. QuickSetup"
+    echo "4. Generate Client-Script Install-1liner"
+    echo "5. Generate Client-Config Install-1liner"
+    echo "6. AdvancedSetup [...]"
+    echo "7. Exit"
+    
+    read -p "Choose an option: " main_option
+    
+    case $main_option in
+        1) install_functions_from_github ;;  # Assuming this is a defined function
+        2) set_cluster ;;  # Function to set up the cluster
+        3) quick_setup ;;  # Runs the QuickSetup function
+        4) generate_client_script_install_oneliner ;;  # Calls the client script install generator
+        5) generate_client_config_install_oneliner ;;  # Calls the client config install generator
+        6) advanced_setup ;;  # Shows the advanced setup submenu
+        7) exit 0 ;;  # Exit the script
+        *) echo "Invalid option. Please choose again." ;;
     esac
 done
