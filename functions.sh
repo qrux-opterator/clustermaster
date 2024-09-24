@@ -265,6 +265,7 @@ replace_config_in_ceremonyclient() {
     BACKUP_DIR="/root/MasterCluster_BackupFiles"
     BACKUP_CONFIG_FILE="$BACKUP_DIR/configbackup.yml"
     ALTERED_CONFIG_FILE="$BACKUP_DIR/config.yml"
+    SOURCE_CONFIG_FILE="/root/ceremonyclient/node/.config/config.yml"
     echo "Replacing the config in ceremonyclient..."
 
     # Check if the backup config file and the current config file exist
