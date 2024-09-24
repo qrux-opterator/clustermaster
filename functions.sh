@@ -1,3 +1,31 @@
+# Function to generate a one-liner for installing the master config.yml on a client server
+generate_client_config_install_command() {
+    # Path to the master config file on the master server
+    MASTER_CONFIG_FILE="/root/MasterCluster_BackupFiles/config.yml"
+    
+    # Check if the master config exists
+    if [ ! -f "$MASTER_CONFIG_FILE" ]; then
+        echo "Master config file not found at $MASTER_CONFIG_FILE"
+        return
+    fi
+    
+    # Generate the one-liner to be run on the client machine
+    echo "######## COPY THIS COMMAND AND RUN ON CLIENT MACHINE ########"
+    echo "mkdir -p /root/ClusterMaster_Backup && \\"
+    echo "if [ -f /root/ceremonyclient/node/.config/config.yml ]; then \\"
+    echo "  mv /root/ceremonyclient/node/.config/config.yml /root/ClusterMaster_Backup/config_backup.yml && \\"
+    echo "  echo 'Backup of config.yml created at /root/ClusterMaster_Backup/config_backup.yml'; \\"
+    echo "else \\"
+    echo "  echo 'No existing config.yml found, proceeding with installation'; \\"
+    echo "fi && \\"
+    echo "scp root@YOUR_MASTER_IP:/root/MasterCluster_BackupFiles/config.yml /root/ceremonyclient/node/.config/config.yml && \\"
+    echo "if [ -f /root/ceremonyclient/node/.config/config.yml ]; then \\"
+    echo "  echo 'config.yml successfully installed'; \\"
+    echo "else \\"
+    echo "  echo 'Failed to install config.yml'; \\"
+    echo "fi"
+}
+
 set_cluster() {
     echo "Enter your cluster details (IP and threads per IP), one per line."
     echo "Format: <IP> <Threads>"
