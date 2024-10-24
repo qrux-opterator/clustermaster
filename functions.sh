@@ -33,7 +33,7 @@ generate_simple_client_config_install_command() {
 }
 
 set_cluster() {
-    echo -e "Enter your cluster details (IP and threads per IP), one per line."
+    echo -e "Enter your cluster details (IP and threads per IP) in a list format. End the list with the word 'end'."
     set +H
     echo -e "Format: IP Threads - \e[32mFirst IP is your Master!\e[0m - example:"
     set -H
@@ -41,18 +41,19 @@ set_cluster() {
     echo "192.168.0.2 32"
     echo "192.168.0.3 48"
     echo -e "\e[32m"
-    echo "When you are done, press Enter on an empty line!"
+    echo "When you are done, type 'end' on the last line!"
     echo -e "\e[0m"
+    
     # Initialize an empty variable to store the input
     user_input=""
 
     # Read user input line by line
     while true; do
         # Read a line from the user
-        read -p "> " input
+        read -r input
 
-        # Check if the user pressed Enter on an empty line (signals the end of input)
-        if [ -z "$input" ]; then
+        # Check if the user typed "end" (signals the end of input)
+        if [ "$input" == "end" ]; then
             break
         fi
 
@@ -65,6 +66,7 @@ set_cluster() {
     
     echo "Cluster settings saved to $SETTINGS_FILE."
 }
+
 
 create_client_installers() {
     # Path to the settings file on the master
