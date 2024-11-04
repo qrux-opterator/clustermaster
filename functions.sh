@@ -403,8 +403,6 @@ setup_master() {
     echo "Original ExecStart line: $original_execstart"
 
     # Modify the ExecStart line with the new thread count
-    sudo sed -i "s|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 0 [0-9]* 1.4.21.1|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 0 $thread_count 1.4.21.1|" "$SERVICE_FILE"
-
     if [[ -s /root/cm_nodeversion.txt ]]; then
             version=$(cat /root/cm_nodeversion.txt)
     else
