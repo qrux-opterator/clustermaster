@@ -1,27 +1,27 @@
 #!/bin/bash
 
-SETTINGS_FILE="/root/cm_settings.txt"
-SOURCE_CONFIG_FILE="/root/ceremonyclient/node/.config/config.yml"
-BACKUP_DIR="/root/MasterCluster_BackupFiles"
+SETTINGS_FILE="$HOME/cm_settings.txt"
+SOURCE_CONFIG_FILE="$HOME/ceremonyclient/node/.config/config.yml"
+BACKUP_DIR="$HOME/MasterCluster_BackupFiles"
 SERVICE_FILE="/etc/systemd/system/para.service"
-VERSION_FILE="/root/cm_nodeversion.txt"
+VERSION_FILE="$HOME/cm_nodeversion.txt"
 
 # Function to install functions from GitHub if they're not present
 install_functions_from_github() {
     echo "Downloading functions from GitHub..."
-    curl -o /root/functions.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/functions.sh
-    if [ -f /root/functions.sh ]; then
+    curl -o $HOME/functions.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/functions.sh
+    if [ -f $HOME/functions.sh ]; then
         echo "Functions successfully installed."
-        source /root/functions.sh
+        source $HOME/functions.sh
     else
         echo "Failed to download functions. Please check your connection."
         exit 1
     fi
 }
 
-# Source the functions from /root/functions.sh if they exist
-if [ -f /root/functions.sh ]; then
-    source /root/functions.sh
+# Source the functions from $HOME/functions.sh if they exist
+if [ -f $HOME/functions.sh ]; then
+    source $HOME/functions.sh
 else
     echo "Functions file not found! Please install the functions first."
 fi
