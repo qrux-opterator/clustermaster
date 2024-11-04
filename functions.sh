@@ -259,7 +259,7 @@ backup_and_setconfig() {
 
     # Minimal debug: print the section containing dataWorkerMultiaddrs
     echo "DEBUG: Showing the relevant section of the altered $ALTERED_CONFIG_FILE:"
-     -n '/dataWorkerMemoryLimit/,/\]/p' "$ALTERED_CONFIG_FILE"
+    echo -n '/dataWorkerMemoryLimit/,/\]/p' "$ALTERED_CONFIG_FILE"
 
     echo "Backup completed and config.yml altered with new IP block."
 }
