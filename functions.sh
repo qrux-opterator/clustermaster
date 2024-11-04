@@ -408,7 +408,7 @@ setup_master() {
     else
             version="2.0.2.4"
     fi
-    sudo sed -i "s|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 0 [0-9]* 1.4.21.1|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 0 $selected_workers $version|" "$SERVICE_FILE"
+    sudo sed -i "/^ExecStart=/s|ExecStart=.*|ExecStart=/bin/bash \$HOME/ceremonyclient/node/para.sh linux amd64 0 \$selected_workers \$version|" "$SERVICE_FILE"
 
 
     # Find and echo the modified ExecStart line
