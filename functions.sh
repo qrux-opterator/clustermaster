@@ -70,7 +70,7 @@ set_cluster() {
 
 create_client_installers() {
     # Path to the settings file on the master
-    SETTINGS_FILE="\$HOME/cm_settings.txt"
+    SETTINGS_FILE="$HOME/cm_settings.txt"
     
     # Read the IPs and workers from cm_settings.txt into an array
     mapfile -t settings < "$SETTINGS_FILE"
