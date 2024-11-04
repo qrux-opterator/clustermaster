@@ -14,17 +14,17 @@ generate_simple_client_config_install_command() {
     echo "##################################################################################"
     echo "################👇 COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
     echo -e "\e[34m"
-    echo "mkdir -p $HOME/ClusterMaster_Backup && \\"
-    echo "if [ -f $HOME/ceremonyclient/node/.config/config.yml ]; then \\"
-    echo "  mv $HOME/ceremonyclient/node/.config/config.yml $HOME/ClusterMaster_Backup/config_backup.yml && \\"
-    echo "  echo 'Backup of config.yml created at $HOME/ClusterMaster_Backup/config_backup.yml'; \\"
+    echo "mkdir -p \$HOME/ClusterMaster_Backup && \\"
+    echo "if [ -f \$HOME/ceremonyclient/node/.config/config.yml ]; then \\"
+    echo "  mv \$HOME/ceremonyclient/node/.config/config.yml \$HOME/ClusterMaster_Backup/config_backup.yml && \\"
+    echo "  echo 'Backup of config.yml created at \$HOME/ClusterMaster_Backup/config_backup.yml'; \\"
     echo "else \\"
     echo "  echo 'No existing config.yml found, proceeding with installation'; \\"
     echo "fi && \\"
-    echo "cat << 'EOF' > $HOME/ceremonyclient/node/.config/config.yml"
+    echo "cat << 'EOF' > \$HOME/ceremonyclient/node/.config/config.yml"
     echo "$config_content"
     echo "EOF"
-    echo "echo 'config.yml successfully installed at $HOME/ceremonyclient/node/.config/config.yml' && \\"
+    echo "echo 'config.yml successfully installed at \$HOME/ceremonyclient/node/.config/config.yml' && \\"
     echo "echo '💻 You can now run your Slave with clustermaster.bash! 👏' && \\"
     echo "$HOME/clustermaster.bash"
     echo -e "\e[0m"
@@ -70,7 +70,7 @@ set_cluster() {
 
 create_client_installers() {
     # Path to the settings file on the master
-    SETTINGS_FILE="$HOME/cm_settings.txt"
+    SETTINGS_FILE="\$HOME/cm_settings.txt"
     
     # Read the IPs and workers from cm_settings.txt into an array
     mapfile -t settings < "$SETTINGS_FILE"
@@ -128,19 +128,19 @@ create_client_installers() {
     else
         version="2.0.2.4"
     fi
-    echo "sudo sed -i 's|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* 1.4.21.1|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers $version|' \$SERVICE_FILE && \\"
+    echo "sudo sed -i 's|ExecStart=/bin/bash \$HOME/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* 1.4.21.1|ExecStart=/bin/bash \$HOME/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers $version|' \$SERVICE_FILE && \\"
     echo "sudo systemctl daemon-reload && \\"
     echo "echo 'para.service has been updated with the new ExecStart line:' && \\"
     echo "grep 'ExecStart=' \$SERVICE_FILE && \\"
-    echo "curl -s -o $HOME/ceremonyclient/node/para.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/para.sh && \\"
-    echo "if [ -f $HOME/ceremonyclient/node/para.sh ]; then echo '✅ para.sh created '; else echo 'Failed to create para.sh ❌'; fi && \\"
+    echo "curl -s -o \$HOME/ceremonyclient/node/para.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/para.sh && \\"
+    echo "if [ -f \$HOME/ceremonyclient/node/para.sh ]; then echo '✅ para.sh created '; else echo 'Failed to create para.sh ❌'; fi && \\"
     echo "yes | sudo ufw enable && sudo ufw allow 22 && sudo ufw allow 443 && sudo ufw allow 8336 && \\"
     echo "sudo ufw allow $start_port:$end_port/tcp && \\"
     echo "echo '✅ Firewall rules 🌐 updated for ports 22, 443, 8336, and $start_port to $end_port/tcp' && \\"
     echo "echo '💻 Downloading clustermaster.bash...' && \\"
-    echo "curl -s -o $HOME/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
-    echo "if [ -f $HOME/clustermaster.bash ]; then chmod +x $HOME/clustermaster.bash; echo 'clustermaster.bash downloaded and made executable'; else echo 'Could not download clustermaster.bash ❌'; fi && \\"
-    echo "if [ -x $HOME/clustermaster.bash ]; then echo '💻 clustermaster.bash is ready ✅'; else echo 'clustermaster.bash is not executable ❌'; fi"
+    echo "curl -s -o \$HOME/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
+    echo "if [ -f \$HOME/clustermaster.bash ]; then chmod +x \$HOME/clustermaster.bash; echo 'clustermaster.bash downloaded and made executable'; else echo 'Could not download clustermaster.bash ❌'; fi && \\"
+    echo "if [ -x \$HOME/clustermaster.bash ]; then echo '💻 clustermaster.bash is ready ✅'; else echo 'clustermaster.bash is not executable ❌'; fi"
     echo -e "\e[0m"
     echo "#######################👆  END - DONT COPY THIS LINE  👆########################"
 
@@ -408,7 +408,7 @@ setup_master() {
     else
             version="2.0.2.4"
     fi
-    sudo sed -i "s|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 0 [0-9]* 1.4.21.1|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 0 $selected_workers $version|" "$SERVICE_FILE"
+    sudo sed -i "s|ExecStart=/bin/bash \$HOME/ceremonyclient/node/para.sh linux amd64 0 [0-9]* 1.4.21.1|ExecStart=/bin/bash \$HOME/ceremonyclient/node/para.sh linux amd64 0 $selected_workers $version|" "$SERVICE_FILE"
 
 
     # Find and echo the modified ExecStart line
