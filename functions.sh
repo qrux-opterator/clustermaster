@@ -123,12 +123,14 @@ create_client_installers() {
     echo -e "\e[34m"
     echo "SERVICE_FILE=/etc/systemd/system/para.service && \\"
     echo "curl -s https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/install_service | sudo bash && \\"
+
     if [[ -s /root/cm_nodeversion.txt ]]; then
-        version=$(cat /root/cm_nodeversion.txt)
+            version=$(cat /root/cm_nodeversion.txt)
     else
-        version="2.0.2.4"
+            version="2.0.2.4"
     fi
-    echo "sudo sed -i 's|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* 1.4.21.1|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers $version|' \$SERVICE_FILE && \\"
+    echo "sudo sed -i 's|^ExecStart=.*|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers $version|' \$SERVICE_FILE && \\"
+
     echo "sudo systemctl daemon-reload && \\"
     echo "echo 'para.service has been updated with the new ExecStart line:' && \\"
     echo "grep 'ExecStart=' \$SERVICE_FILE && \\"
@@ -186,7 +188,7 @@ create_ip_block() {
     done
 
     # Remove the trailing comma from the last entry
-    config_block=$(echo "$config_block" | sed '$s/,$//')
+    config_block=$(echo "$config_block" |  '$s/,$//')
 
     # Write the config block to the config_block.txt file
     echo -n "$config_block" > "$CONFIG_BLOCK_FILE"
@@ -257,7 +259,7 @@ backup_and_setconfig() {
 
     # Minimal debug: print the section containing dataWorkerMultiaddrs
     echo "DEBUG: Showing the relevant section of the altered $ALTERED_CONFIG_FILE:"
-    sed -n '/dataWorkerMemoryLimit/,/\]/p' "$ALTERED_CONFIG_FILE"
+     -n '/dataWorkerMemoryLimit/,/\]/p' "$ALTERED_CONFIG_FILE"
 
     echo "Backup completed and config.yml altered with new IP block."
 }
@@ -409,8 +411,7 @@ setup_master() {
         version="2.0.2.4"
     fi
 
-    echo "sudo sed -i 's|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* [0-9.]*|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers $version|' \$SERVICE_FILE && \\"
-
+    echo "sudo sed -i 's|^ExecStart=.*|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 0 $selected_workers $version|' \$SERVICE_FILE && \\"
 
     # Find and echo the modified ExecStart line
     modified_execstart=$(grep '^ExecStart=' "$SERVICE_FILE")
