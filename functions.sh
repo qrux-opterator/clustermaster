@@ -238,21 +238,21 @@ backup_and_setconfig() {
         !inside_block { print }
     ' "$ALTERED_CONFIG_FILE" > "$ALTERED_CONFIG_FILE.tmp" && mv "$ALTERED_CONFIG_FILE.tmp" "$ALTERED_CONFIG_FILE"
 
-    # Add the new dataWorkerMultiaddrs block under the 'engine:' section
-    if grep -q "engine:" "$ALTERED_CONFIG_FILE"; then
-        echo "DEBUG: Adding the new dataWorkerMultiaddrs block under 'engine:'."
+    # Add the new dataWorkerMultiaddrs block below 'dataWorkerMemoryLimit'
+    if grep -q "dataWorkerMemoryLimit" "$ALTERED_CONFIG_FILE"; then
+        echo "DEBUG: Adding the new dataWorkerMultiaddrs block under 'dataWorkerMemoryLimit'."
         awk -v new_block="$data_worker_multiaddrs_block" '
-            /engine:/ { print; print new_block; next }
+            /dataWorkerMemoryLimit/ { print; print new_block; next }
             { print }
         ' "$ALTERED_CONFIG_FILE" > "$ALTERED_CONFIG_FILE.tmp" && mv "$ALTERED_CONFIG_FILE.tmp" "$ALTERED_CONFIG_FILE"
     else
-        echo "ERROR: 'engine:' section not found. Could not insert dataWorkerMultiaddrs block."
+        echo "ERROR: 'dataWorkerMemoryLimit' section not found. Could not insert dataWorkerMultiaddrs block."
         return 1
     fi
 
     # Minimal debug: print the section containing dataWorkerMultiaddrs
     echo "DEBUG: Showing the relevant section of the altered $ALTERED_CONFIG_FILE:"
-    sed -n '/engine:/,/provingKeyId/p' "$ALTERED_CONFIG_FILE"
+    sed -n '/dataWorkerMemoryLimit/,/\]/p' "$ALTERED_CONFIG_FILE"
 
     echo "Backup completed and config.yml altered with new IP block."
 }
