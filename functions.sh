@@ -128,7 +128,7 @@ create_client_installers() {
     else
         version="2.0.2.4"
     fi
-    echo "sudo sed -i 's|ExecStart=/bin/bash \$HOME/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* 1.4.21.1|ExecStart=/bin/bash \$HOME/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers $version|' \$SERVICE_FILE && \\"
+    echo "sudo sed -i '/^ExecStart=/c\\ExecStart=/bin/bash \\$HOME/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers $version' \$SERVICE_FILE && \\"
     echo "sudo systemctl daemon-reload && \\"
     echo "echo 'para.service has been updated with the new ExecStart line:' && \\"
     echo "grep 'ExecStart=' \$SERVICE_FILE && \\"
