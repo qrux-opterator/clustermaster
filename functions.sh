@@ -1,5 +1,5 @@
 generate_simple_client_config_install_command() {
-        MASTER_CONFIG_FILE="/root/MasterCluster_BackupFiles/config.yml"
+        MASTER_CONFIG_FILE="$HOME/MasterCluster_BackupFiles/config.yml"
 
     # Check if the master config exists
     if [ ! -f "$MASTER_CONFIG_FILE" ]; then
@@ -14,19 +14,19 @@ generate_simple_client_config_install_command() {
     echo "##################################################################################"
     echo "################👇 COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
     echo -e "\e[34m"
-    echo "mkdir -p /root/ClusterMaster_Backup && \\"
-    echo "if [ -f /root/ceremonyclient/node/.config/config.yml ]; then \\"
-    echo "  mv /root/ceremonyclient/node/.config/config.yml /root/ClusterMaster_Backup/config_backup.yml && \\"
-    echo "  echo 'Backup of config.yml created at /root/ClusterMaster_Backup/config_backup.yml'; \\"
+    echo "mkdir -p $HOME/ClusterMaster_Backup && \\"
+    echo "if [ -f $HOME/ceremonyclient/node/.config/config.yml ]; then \\"
+    echo "  mv $HOME/ceremonyclient/node/.config/config.yml $HOME/ClusterMaster_Backup/config_backup.yml && \\"
+    echo "  echo 'Backup of config.yml created at $HOME/ClusterMaster_Backup/config_backup.yml'; \\"
     echo "else \\"
     echo "  echo 'No existing config.yml found, proceeding with installation'; \\"
     echo "fi && \\"
-    echo "cat << 'EOF' > /root/ceremonyclient/node/.config/config.yml"
+    echo "cat << 'EOF' > $HOME/ceremonyclient/node/.config/config.yml"
     echo "$config_content"
     echo "EOF"
-    echo "echo 'config.yml successfully installed at /root/ceremonyclient/node/.config/config.yml' && \\"
+    echo "echo 'config.yml successfully installed at $HOME/ceremonyclient/node/.config/config.yml' && \\"
     echo "echo '💻 You can now run your Slave with clustermaster.bash! 👏' && \\"
-    echo "/root/clustermaster.bash"
+    echo "$HOME/clustermaster.bash"
     echo -e "\e[0m"
     echo "#######################👆  END - DONT COPY THIS LINE  👆######################"
     echo "##################################################################################"
@@ -70,7 +70,7 @@ set_cluster() {
 
 create_client_installers() {
     # Path to the settings file on the master
-    SETTINGS_FILE="/root/cm_settings.txt"
+    SETTINGS_FILE="$HOME/cm_settings.txt"
     
     # Read the IPs and workers from cm_settings.txt into an array
     mapfile -t settings < "$SETTINGS_FILE"
@@ -123,24 +123,24 @@ create_client_installers() {
     echo -e "\e[34m"
     echo "SERVICE_FILE=/etc/systemd/system/para.service && \\"
     echo "curl -s https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/install_service | sudo bash && \\"
-    if [[ -s /root/cm_nodeversion.txt ]]; then
-        version=$(cat /root/cm_nodeversion.txt)
+    if [[ -s $HOME/cm_nodeversion.txt ]]; then
+        version=$(cat $HOME/cm_nodeversion.txt)
     else
         version="2.0.2.4"
     fi
-    echo "sudo sed -i 's|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* 1.4.21.1|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers $version|' \$SERVICE_FILE && \\"
+    echo "sudo sed -i 's|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 [0-9]* [0-9]* 1.4.21.1|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers $version|' \$SERVICE_FILE && \\"
     echo "sudo systemctl daemon-reload && \\"
     echo "echo 'para.service has been updated with the new ExecStart line:' && \\"
     echo "grep 'ExecStart=' \$SERVICE_FILE && \\"
-    echo "curl -s -o /root/ceremonyclient/node/para.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/para.sh && \\"
-    echo "if [ -f /root/ceremonyclient/node/para.sh ]; then echo '✅ para.sh created '; else echo 'Failed to create para.sh ❌'; fi && \\"
+    echo "curl -s -o $HOME/ceremonyclient/node/para.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/para.sh && \\"
+    echo "if [ -f $HOME/ceremonyclient/node/para.sh ]; then echo '✅ para.sh created '; else echo 'Failed to create para.sh ❌'; fi && \\"
     echo "yes | sudo ufw enable && sudo ufw allow 22 && sudo ufw allow 443 && sudo ufw allow 8336 && \\"
     echo "sudo ufw allow $start_port:$end_port/tcp && \\"
     echo "echo '✅ Firewall rules 🌐 updated for ports 22, 443, 8336, and $start_port to $end_port/tcp' && \\"
     echo "echo '💻 Downloading clustermaster.bash...' && \\"
-    echo "curl -s -o /root/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
-    echo "if [ -f /root/clustermaster.bash ]; then chmod +x /root/clustermaster.bash; echo 'clustermaster.bash downloaded and made executable'; else echo 'Could not download clustermaster.bash ❌'; fi && \\"
-    echo "if [ -x /root/clustermaster.bash ]; then echo '💻 clustermaster.bash is ready ✅'; else echo 'clustermaster.bash is not executable ❌'; fi"
+    echo "curl -s -o $HOME/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
+    echo "if [ -f $HOME/clustermaster.bash ]; then chmod +x $HOME/clustermaster.bash; echo 'clustermaster.bash downloaded and made executable'; else echo 'Could not download clustermaster.bash ❌'; fi && \\"
+    echo "if [ -x $HOME/clustermaster.bash ]; then echo '💻 clustermaster.bash is ready ✅'; else echo 'clustermaster.bash is not executable ❌'; fi"
     echo -e "\e[0m"
     echo "#######################👆  END - DONT COPY THIS LINE  👆########################"
 
@@ -149,8 +149,8 @@ create_client_installers() {
 # Function to create the IP-Block for config
 create_ip_block() {
     # Define the necessary variables
-    SETTINGS_FILE="/root/cm_settings.txt"
-    CONFIG_BLOCK_FILE="/root/config_block.txt"
+    SETTINGS_FILE="$HOME/cm_settings.txt"
+    CONFIG_BLOCK_FILE="$HOME/config_block.txt"
     BASE_PORT=40000  # Starting base port for all
 
     # Check if the settings file exists
@@ -200,11 +200,11 @@ backup_and_setconfig() {
     echo "Backing up and setting config..."
 
     # Define paths for the source and backup config files
-    SOURCE_CONFIG_FILE="/root/ceremonyclient/node/.config/config.yml"
-    BACKUP_DIR="/root/MasterCluster_BackupFiles"
+    SOURCE_CONFIG_FILE="$HOME/ceremonyclient/node/.config/config.yml"
+    BACKUP_DIR="$HOME/MasterCluster_BackupFiles"
     BACKUP_CONFIG_FILE="$BACKUP_DIR/configbackup.yml"
     ALTERED_CONFIG_FILE="$BACKUP_DIR/config.yml"
-    CONFIG_BLOCK_FILE="/root/config_block.txt"
+    CONFIG_BLOCK_FILE="$HOME/config_block.txt"
 
     # Check if the source config file exists
     if [ ! -f "$SOURCE_CONFIG_FILE" ]; then
@@ -310,10 +310,10 @@ stop_node_tasks_and_services() {
 
 # Function to replace config in ceremonyclient
 replace_config_in_ceremonyclient() {
-    BACKUP_DIR="/root/MasterCluster_BackupFiles"
+    BACKUP_DIR="$HOME/MasterCluster_BackupFiles"
     BACKUP_CONFIG_FILE="$BACKUP_DIR/configbackup.yml"
     ALTERED_CONFIG_FILE="$BACKUP_DIR/config.yml"
-    SOURCE_CONFIG_FILE="/root/ceremonyclient/node/.config/config.yml"
+    SOURCE_CONFIG_FILE="$HOME/ceremonyclient/node/.config/config.yml"
     echo "Replacing the config in ceremonyclient..."
 
     # Check if the backup config file and the current config file exist
@@ -358,9 +358,9 @@ setup_master() {
     echo "Setting up the master node..."
 
     # Define variables
-    SETTINGS_FILE="/root/cm_settings.txt"  # Path to the cluster settings
+    SETTINGS_FILE="$HOME/cm_settings.txt"  # Path to the cluster settings
     SERVICE_FILE="/etc/systemd/system/para.service"  # Path to the para service file
-    PARA_SCRIPT_PATH="/root/ceremonyclient/node/para.sh"  # Path to the para.sh script
+    PARA_SCRIPT_PATH="$HOME/ceremonyclient/node/para.sh"  # Path to the para.sh script
 
     # Step 1: Run the install_service script from GitHub
     echo "Running the install_service script..."
@@ -403,12 +403,12 @@ setup_master() {
     echo "Original ExecStart line: $original_execstart"
 
     # Modify the ExecStart line with the new thread count
-    if [[ -s /root/cm_nodeversion.txt ]]; then
-            version=$(cat /root/cm_nodeversion.txt)
+    if [[ -s $HOME/cm_nodeversion.txt ]]; then
+            version=$(cat $HOME/cm_nodeversion.txt)
     else
             version="2.0.2.4"
     fi
-    sudo sed -i "s|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 0 [0-9]* 1.4.21.1|ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 0 $selected_workers $version|" "$SERVICE_FILE"
+    sudo sed -i "s|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 0 [0-9]* 1.4.21.1|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 0 $selected_workers $version|" "$SERVICE_FILE"
 
 
     # Find and echo the modified ExecStart line
