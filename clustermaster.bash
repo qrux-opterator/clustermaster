@@ -1,29 +1,64 @@
 #!/bin/bash
 
-SETTINGS_FILE="$HOME/cm_settings.txt"
-SOURCE_CONFIG_FILE="$HOME/ceremonyclient/node/.config/config.yml"
-BACKUP_DIR="$HOME/MasterCluster_BackupFiles"
+SETTINGS_FILE="/root/cm_settings.txt"
+SOURCE_CONFIG_FILE="/root/ceremonyclient/node/.config/config.yml"
+BACKUP_DIR="/root/MasterCluster_BackupFiles"
 SERVICE_FILE="/etc/systemd/system/para.service"
+VERSION_FILE="/root/cm_nodeversion.txt"
 
 # Function to install functions from GitHub if they're not present
 install_functions_from_github() {
     echo "Downloading functions from GitHub..."
-    curl -o $HOME/functions.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/functions.sh
-    if [ -f $HOME/functions.sh ]; then
+    curl -o /root/functions.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/functions.sh
+    if [ -f /root/functions.sh ]; then
         echo "Functions successfully installed."
-        source $HOME/functions.sh
+        source /root/functions.sh
     else
         echo "Failed to download functions. Please check your connection."
         exit 1
     fi
 }
 
-# Source the functions from $HOME/functions.sh if they exist
-if [ -f $HOME/functions.sh ]; then
-    source $HOME/functions.sh
+# Source the functions from /root/functions.sh if they exist
+if [ -f /root/functions.sh ]; then
+    source /root/functions.sh
 else
     echo "Functions file not found! Please install the functions first."
 fi
+
+# Function to set the node version
+set_version() {
+    echo "Set Version Menu:"
+    echo "1. 2.0.2.4 (Default)"
+    echo "2. 2.0.3 (Next Update)"
+    echo "3. 2.0.3-testnet (Testnet)"
+    echo "4. Custom Version"
+    
+    read -p "Choose a version option: " version_option
+
+    case $version_option in
+        1)
+            echo "2.0.2.4" > "$VERSION_FILE"
+            echo "Version set to 2.0.2.4 (Default)."
+            ;;
+        2)
+            echo "2.0.3" > "$VERSION_FILE"
+            echo "Version set to 2.0.3 (Next Update)."
+            ;;
+        3)
+            echo "2.0.3-testnet" > "$VERSION_FILE"
+            echo "Version set to 2.0.3-testnet (Testnet)."
+            ;;
+        4)
+            read -p "Enter custom version: " custom_version
+            echo "$custom_version" > "$VERSION_FILE"
+            echo "Version set to custom version: $custom_version."
+            ;;
+        *)
+            echo "Invalid option. Returning to main menu."
+            ;;
+    esac
+}
 
 # Function for QuickSetup (runs steps 3-7 sequentially)
 quick_setup() {
@@ -123,12 +158,21 @@ stop_node() {
 # Main Menu
 main_menu() {
     while true; do
+        # Display the current version at the top of the menu
+        if [ -f "$VERSION_FILE" ]; then
+            current_version=$(cat "$VERSION_FILE")
+        else
+            current_version="Not Set"
+        fi
+        echo "Current Node Version: $current_version"
+        
         echo "Main Menu:"
         echo "1. Show Logs"
         echo "2. Start / Restart Node"
         echo "3. Stop Node"
         echo "4. Install Cluster [...]"
-        echo "5. Exit"
+        echo "5. Set Version"
+        echo "6. Exit"
         
         read -p "Choose an option: " main_option
         
@@ -137,7 +181,8 @@ main_menu() {
             2) start_or_restart_node ;;  # Start/Restart the node
             3) stop_node ;;  # Stop the node
             4) install_cluster ;;  # Install Cluster Menu
-            5) exit 0 ;;  # Exit the script
+            5) set_version ;;  # Set Version
+            6) exit 0 ;;  # Exit the script
             *) echo "Invalid option. Please choose again." ;;
         esac
     done
