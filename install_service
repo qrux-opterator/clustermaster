@@ -4,13 +4,13 @@ After=network.target
 
 [Service]
 # Set Your beginning core (0) and Workers You run (1)
-ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 0 1 1.4.21.1
-Restart=always
+ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 0 1 2.0.2.4
+Restart=on-failure
+KillSignal=SIGINT
+TimeoutStopSec=30s
 User=root
 Group=root
 WorkingDirectory=/root/ceremonyclient/node
-StandardOutput=syslog
-StandardError=syslog
 SyslogIdentifier=para
 
 [Install]
