@@ -17,7 +17,7 @@ declare -A worker_pids
 
 if [ "$startingCore" -eq 0 ]; then
     # Start parent node with core 0
-    cmd="$DIR_PATH/node-$version-$os-$architecture --core=0 --signature-check=false --network=1"
+    cmd="$DIR_PATH/node-$version-$os-$architecture --core=0"
     echo "DEBUG: Starting parent node with command: $cmd"
     $cmd &
     parent_pid=$!
@@ -29,7 +29,7 @@ if [ "$startingCore" -eq 0 ]; then
 
     # Start worker nodes from core 1 to maxCores - 1
     for core_num in $(seq 1 $((maxCores - 1))); do
-        cmd="$DIR_PATH/node-$version-$os-$architecture --core=$core_num --signature-check=false --network=1 --parent-process=$parent_pid"
+        cmd="$DIR_PATH/node-$version-$os-$architecture --core=$core_num --parent-process=$parent_pid"
         echo "DEBUG: Deploying core $core_num with command: $cmd"
         $cmd &
         worker_pids[$core_num]=$!
@@ -39,7 +39,7 @@ else
 
     # Start worker nodes from startingCore + 1 to startingCore + maxCores
     for core_num in $(seq $((startingCore + 1)) $((startingCore + maxCores))); do
-        cmd="$DIR_PATH/node-$version-$os-$architecture --core=$core_num --signature-check=false --network=1"
+        cmd="$DIR_PATH/node-$version-$os-$architecture --core=$core_num"
         echo "DEBUG: Deploying core $core_num with command: $cmd"
         $cmd &
         worker_pids[$core_num]=$!
