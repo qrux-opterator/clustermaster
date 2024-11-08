@@ -105,7 +105,7 @@ create_client_installers() {
     # Get the selected client IP and workers
     selected_ip=$(echo "${settings[$((choice-1))]}" | awk '{print $1}')
     selected_workers=$(echo "${settings[$((choice-1))]}" | awk '{print $2}')
-
+    echo "Debug: Selected workers value read: $selected_workers"
     # Calculate total workers for all preceding machines and subtract 1
     total_workers=0
     for ((j=0; j<choice-1; j++)); do
