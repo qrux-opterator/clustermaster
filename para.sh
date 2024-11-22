@@ -17,7 +17,7 @@ declare -A worker_pids
 
 if [ "$startingCore" -eq 0 ]; then
     # Start parent node with core 0
-    cmd="$DIR_PATH/node-$version-$os-$architecture --core=0"
+    cmd="$DIR_PATH/node-$version-$os-$architecture"
     echo "DEBUG: Starting parent node with command: $cmd"
     $cmd &
     parent_pid=$!
