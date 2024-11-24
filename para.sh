@@ -52,7 +52,9 @@ check_workers() {
         pid=${worker_pids[$core_num]}
         if ! kill -0 $pid 2>/dev/null; then
             echo "WORKER FAILED: Core $core_num"
-            # TODO: Future enhancement to restart the worker
+            sleep 5
+            service para restart
+            exit
         fi
     done
 }
