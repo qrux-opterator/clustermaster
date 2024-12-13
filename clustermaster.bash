@@ -115,21 +115,20 @@ install_cluster() {
         echo "1. Download Functions"
         echo "2. Input IPs and Threads"
         echo "3. QuickSetup"
-        echo "4. Generate Client-Script Install-1liner"
-        echo "5. Generate Client-Config Install-1liner"
-        echo "6. AdvancedSetup [...]"
-        echo "7. Back to Main Menu"
+        echo "4. Install - Slaves"
+        echo "5. AdvancedSetup [...]"
+        echo "6. Back to Main Menu"
         
         read -p "Choose an option: " cluster_option
         
         case $cluster_option in
-            1) install_functions_from_github ;;  # Download functions
-            2) set_cluster ;;  # Input IPs and Threads (renamed)
-            3) quick_setup ;;  # Run the QuickSetup function
-            4) generate_client_script_install_oneliner ;;  # Client script installer generator
-            5) generate_simple_client_config_install_command ;;  # Client config installer generator
-            6) advanced_setup ;;  # Advanced setup submenu
-            7) break ;;  # Go back to the main menu
+            1) install_functions_from_github ;;   # Download functions
+            2) set_cluster ;;                    # Input IPs and Threads (renamed)
+            3) quick_setup ;;                    # Run QuickSetup
+            4) generate_client_script_install_oneliner
+               generate_simple_client_config_install_command ;;  # Combined action
+            5) advanced_setup ;;                 # Advanced setup submenu
+            6) break ;;                          # Go back to main menu
             *) echo "Invalid option. Please choose again." ;;
         esac
     done
