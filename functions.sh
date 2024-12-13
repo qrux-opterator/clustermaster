@@ -65,20 +65,27 @@ set_cluster() {
 
 
 
-
 create_client_installers() {
     echo -e "\e[34m"
     SETTINGS_FILE="$HOME/cm_settings.txt"
+
+    # Determine version from /root/cm_nodeversion.txt or use default if not found or empty
+    if [[ -s "/root/cm_nodeversion.txt" ]]; then
+        version=$(cat /root/cm_nodeversion.txt)
+    else
+        version="2.0.5.1"
+    fi
+
     # Read and convert cm_settings.txt to a single line with \n escapes
     cm_settings_contents=$(sed ':a;N;$!ba;s/\n/\\n/g' "$SETTINGS_FILE")
+
     echo "################👇 COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
     echo "current_ip=\"\$(curl -s ifconfig.me)\" && \\"
     echo "workers_before=\$(echo -e \"$cm_settings_contents\" | awk -v myip=\"\$current_ip\" '{if (found) exit; if (\$1 == myip) found=1; else sum+=\$2} END {print sum}') && \\"
     echo "slave_workers=\$(echo -e \"$cm_settings_contents\" | awk -v myip=\"\$current_ip\" '\$1 == myip {print \$2}') && \\"
-    echo "version=\"2.0.2.4\" && \\"
+    echo "version=\"$version\" && \\"
     echo "curl -s https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/install_service | sudo bash && \\"
     echo "SERVICE_FILE=/etc/systemd/system/para.service && \\"
-    # Notice the escaped \$ so that on the master, it's printed literally. On the slave, it will be expanded.
     echo "sudo sed -i \"/^ExecStart=/cExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 \$workers_before \$slave_workers \$version\" \$SERVICE_FILE && \\"
     echo "sudo systemctl daemon-reload && \\"
     echo "echo 'para.service has been updated with the new ExecStart line:' && \\"
@@ -95,8 +102,9 @@ create_client_installers() {
     echo "if [ -x \$HOME/clustermaster.bash ]; then echo '💻 clustermaster.bash is ready ✅'; else echo 'clustermaster.bash is not executable ❌'; fi"
     echo "#######################👆  END - RUN THIS ON YOUR SLAVES 👆########################"
     echo -e "\e[0m"
-
 }
+
+
 
 
 
