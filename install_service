@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 # Set Your beginning core (0) and Workers You run (1)
-ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 0 1 2.0.3
+ExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 0 1 2.0.5.1
 Restart=on-failure
 KillSignal=SIGINT
 KillMode=control-group
