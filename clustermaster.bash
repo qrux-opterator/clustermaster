@@ -5,14 +5,15 @@ SOURCE_CONFIG_FILE="$HOME/ceremonyclient/node/.config/config.yml"
 BACKUP_DIR="$HOME/MasterCluster_BackupFiles"
 SERVICE_FILE="/etc/systemd/system/para.service"
 VERSION_FILE="$HOME/cm_nodeversion.txt"
+DEFAULT_CONFIG_FILE="/root/cm_default.txt"
 
 # Function to install functions from GitHub if they're not present
 install_functions_from_github() {
     echo "Downloading functions from GitHub..."
-    curl -o $HOME/functions.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/functions.sh
-    if [ -f $HOME/functions.sh ]; then
+    curl -o "$HOME/functions.sh" https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/functions.sh
+    if [ -f "$HOME/functions.sh" ]; then
         echo "Functions successfully installed."
-        source $HOME/functions.sh
+        source "$HOME/functions.sh"
     else
         echo "Failed to download functions. Please check your connection."
         exit 1
@@ -20,10 +21,11 @@ install_functions_from_github() {
 }
 
 # Source the functions from $HOME/functions.sh if they exist
-if [ -f $HOME/functions.sh ]; then
-    source $HOME/functions.sh
+if [ -f "$HOME/functions.sh" ]; then
+    source "$HOME/functions.sh"
 else
     echo "Functions file not found! Please install the functions first."
+    echo "Use option 1 in the 'Install Cluster Menu' to download functions."
 fi
 
 # Function to set the node version
@@ -60,12 +62,46 @@ set_version() {
     esac
 }
 
-# Function for QuickSetup (runs steps 3-7 sequentially)
+# Function for QuickSetup (runs steps sequentially with conditional stopping)
 quick_setup() {
     echo "Starting Quick Setup..."
     create_ip_block
     backup_and_setconfig
-    stop_node_tasks_and_services
+
+    # Add condition here for stop_node_tasks_and_services
+    if [ -f "$DEFAULT_CONFIG_FILE" ]; then
+        # Read the variable value, default to lowercase
+        restart_var=$(grep '^restart_after_config_change=' "$DEFAULT_CONFIG_FILE" | cut -d '=' -f2 | tr '[:upper:]' '[:lower:]')
+        if [ "$restart_var" = "yes" ]; then
+            echo "Configuration specifies to restart after config change. Stopping node tasks and services..."
+            stop_node_tasks_and_services
+        elif [ "$restart_var" = "no" ]; then
+            echo "Configuration specifies not to restart after config change. Skipping stopping node tasks and services."
+        else
+            echo "Variable 'restart_after_config_change' is set to '$restart_var', which is invalid."
+            read -p "Do you want to stop node tasks and services? (y/n): " choice
+            case "$choice" in
+                y|Y ) 
+                    stop_node_tasks_and_services 
+                    ;;
+                * ) 
+                    echo "Skipping stopping node tasks and services."
+                    ;;
+            esac
+        fi
+    else
+        echo "Configuration file $DEFAULT_CONFIG_FILE not found."
+        read -p "Do you want to stop node tasks and services? (y/n): " choice
+        case "$choice" in
+            y|Y ) 
+                stop_node_tasks_and_services 
+                ;;
+            * ) 
+                echo "Skipping stopping node tasks and services."
+                ;;
+        esac
+    fi
+
     replace_config_in_ceremonyclient
     setup_master
     echo "Quick Setup completed."
@@ -105,7 +141,7 @@ generate_client_script_install_oneliner() {
 # Function to generate the client-config install one-liner
 generate_client_config_install_oneliner() {
     echo "Generating Client-Config Install One-Liner..."
-    generate_client_config_install_command
+    generate_simple_client_config_install_command
 }
 
 # Menu for Install Cluster
@@ -125,8 +161,10 @@ install_cluster() {
             1) install_functions_from_github ;;   # Download functions
             2) set_cluster ;;                    # Input IPs and Threads (renamed)
             3) quick_setup ;;                    # Run QuickSetup
-            4) generate_client_script_install_oneliner
-               generate_simple_client_config_install_command ;;  # Combined action
+            4) 
+                generate_client_script_install_oneliner
+                generate_client_config_install_oneliner 
+                ;;  # Combined Install - Slaves
             5) advanced_setup ;;                 # Advanced setup submenu
             6) break ;;                          # Go back to main menu
             *) echo "Invalid option. Please choose again." ;;
@@ -143,14 +181,14 @@ show_logs() {
 # Function to start or restart the node
 start_or_restart_node() {
     echo "Starting or Restarting the para service..."
-    systemctl daemon-reload && service para restart
+    systemctl daemon-reload && sudo systemctl restart para
     echo "Node started/restarted."
 }
 
 # Function to stop the node
 stop_node() {
     echo "Stopping the para service..."
-    service para stop
+    sudo systemctl stop para
     echo "Node stopped."
 }
 
@@ -176,12 +214,12 @@ main_menu() {
         read -p "Choose an option: " main_option
         
         case $main_option in
-            1) show_logs ;;  # Show logs
-            2) start_or_restart_node ;;  # Start/Restart the node
-            3) stop_node ;;  # Stop the node
-            4) install_cluster ;;  # Install Cluster Menu
-            5) set_version ;;  # Set Version
-            6) exit 0 ;;  # Exit the script
+            1) show_logs ;;                      # Show logs
+            2) start_or_restart_node ;;          # Start/Restart the node
+            3) stop_node ;;                      # Stop the node
+            4) install_cluster ;;                # Install Cluster Menu
+            5) set_version ;;                    # Set Version
+            6) exit 0 ;;                         # Exit the script
             *) echo "Invalid option. Please choose again." ;;
         esac
     done
