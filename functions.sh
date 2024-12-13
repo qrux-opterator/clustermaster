@@ -136,7 +136,7 @@ create_ip_block() {
 
         # If this is the first IP (Master), subtract 1 worker count
         if [ "$i" -eq 0 ]; then
-            workers=$((workers - 1))  # Master has one less worker
+            workers=$((workers))  # Master has one less worker
         fi
 
         # Generate the config block lines for each worker/thread
@@ -369,7 +369,7 @@ setup_master() {
     else
             version="2.0.2.4"
     fi
-    sudo sed -i "/^ExecStart=/s|ExecStart=.*|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 0 $((thread_count - 1)) $version|" "$SERVICE_FILE"
+    sudo sed -i "/^ExecStart=/s|ExecStart=.*|ExecStart=/bin/bash $HOME/ceremonyclient/node/para.sh linux amd64 0 $((thread_count)) $version|" "$SERVICE_FILE"
 
 
     # Find and echo the modified ExecStart line
