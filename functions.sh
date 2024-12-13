@@ -68,83 +68,39 @@ set_cluster() {
 }
 
 
+
+
 create_client_installers() {
-    # Path to the settings file on the master
     SETTINGS_FILE="$HOME/cm_settings.txt"
-    
-    # Read the IPs and workers from cm_settings.txt into an array
-    mapfile -t settings < "$SETTINGS_FILE"
+    # Read and convert cm_settings.txt to a single line with \n escapes
+    cm_settings_contents=$(sed ':a;N;$!ba;s/\n/\\n/g' "$SETTINGS_FILE")
 
-    echo "Cluster Overview:"
-    echo "------------------------------------"
-
-    # Display all IPs and workers but mark the first one (master) as not selectable
-    for i in "${!settings[@]}"; do
-        ip=$(echo "${settings[$i]}" | awk '{print $1}')
-        workers=$(echo "${settings[$i]}" | awk '{print $2}')
-        if [ $i -eq 0 ]; then
-            echo "$((i+1)). $ip (Master, $workers workers)"
-        else
-            echo "$((i+1)). $ip ($workers workers)"
-        fi
-    done
-
-    echo "------------------------------------"
-    echo "Choose a client machine to create an installer for (Master cannot be selected):"
-    
-    # Read user selection (must be greater than 1, since Master is index 0)
-    while true; do
-        read -p "Enter the number of the client machine: " choice
-        if ((choice > 1 && choice <= ${#settings[@]})); then
-            break
-        else
-            echo "Invalid selection. Please choose a valid client machine."
-        fi
-    done
-
-    # Get the selected client IP and workers
-    selected_ip=$(echo "${settings[$((choice-1))]}" | awk '{print $1}')
-    selected_workers=$(echo "${settings[$((choice-1))]}" | awk '{print $2}')
-    echo "Debug: Selected workers value read: $selected_workers"
-    # Calculate total workers for all preceding machines and subtract 1
-    total_workers=0
-    for ((j=0; j<choice-1; j++)); do
-        prev_workers=$(echo "${settings[$j]}" | awk '{print $2}')
-        total_workers=$((total_workers + prev_workers))
-    done
-    total_workers=$((total_workers - 1))
-
-    # Calculate the port range for the selected machine
-    start_port=40000
-    end_port=$((start_port + selected_workers))
-
-    # Create the one-liner with $SERVICE_FILE, firewall commands, and the dynamic port range
     echo "################👇  COPY THIS COMMAND AND RUN ON CLIENT MACHINE  👇################"
-    echo -e "\e[34m"
-    echo "SERVICE_FILE=/etc/systemd/system/para.service && \\"
+    echo "current_ip=\"\$(curl -s ifconfig.me)\" && \\"
+    echo "workers_before=\$(echo -e \"$cm_settings_contents\" | awk -v myip=\"\$current_ip\" '{if (found) exit; if (\$1 == myip) found=1; else sum+=\$2} END {print sum}') && \\"
+    echo "slave_workers=\$(echo -e \"$cm_settings_contents\" | awk -v myip=\"\$current_ip\" '\$1 == myip {print \$2}') && \\"
+    echo "version=\"2.0.2.4\" && \\"
     echo "curl -s https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/install_service | sudo bash && \\"
-    if [[ -s $HOME/cm_nodeversion.txt ]]; then
-        version=$(cat $HOME/cm_nodeversion.txt)
-    else
-        version="2.0.2.4"
-    fi
-    echo "sudo sed -i '/^ExecStart=/c\\ExecStart=/bin/bash \\$HOME/ceremonyclient/node/para.sh linux amd64 $total_workers $selected_workers $version' \$SERVICE_FILE && \\"
+    echo "SERVICE_FILE=/etc/systemd/system/para.service && \\"
+    # Notice the escaped \$ so that on the master, it's printed literally. On the slave, it will be expanded.
+    echo "sudo sed -i \"/^ExecStart=/cExecStart=/bin/bash /root/ceremonyclient/node/para.sh linux amd64 \$workers_before \$slave_workers \$version\" \$SERVICE_FILE && \\"
     echo "sudo systemctl daemon-reload && \\"
     echo "echo 'para.service has been updated with the new ExecStart line:' && \\"
     echo "grep 'ExecStart=' \$SERVICE_FILE && \\"
     echo "curl -s -o \$HOME/ceremonyclient/node/para.sh https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/para.sh && \\"
     echo "if [ -f \$HOME/ceremonyclient/node/para.sh ]; then echo '✅ para.sh created '; else echo 'Failed to create para.sh ❌'; fi && \\"
+    echo "end_port=\$((40000 + slave_workers)) && \\"
     echo "yes | sudo ufw enable && sudo ufw allow 22 && sudo ufw allow 443 && sudo ufw allow 8336 && \\"
-    echo "sudo ufw allow $start_port:$end_port/tcp && \\"
-    echo "echo '✅ Firewall rules 🌐 updated for ports 22, 443, 8336, and $start_port to $end_port/tcp' && \\"
+    echo "sudo ufw allow 40000:\$end_port/tcp && \\"
+    echo "echo '✅ Firewall rules 🌐 updated for ports 22, 443, 8336, and 40000 to \$end_port/tcp' && \\"
     echo "echo '💻 Downloading clustermaster.bash...' && \\"
     echo "curl -s -o \$HOME/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
     echo "if [ -f \$HOME/clustermaster.bash ]; then chmod +x \$HOME/clustermaster.bash; echo 'clustermaster.bash downloaded and made executable'; else echo 'Could not download clustermaster.bash ❌'; fi && \\"
     echo "if [ -x \$HOME/clustermaster.bash ]; then echo '💻 clustermaster.bash is ready ✅'; else echo 'clustermaster.bash is not executable ❌'; fi"
-    echo -e "\e[0m"
     echo "#######################👆  END - DONT COPY THIS LINE  👆########################"
-
 }
+
+
 
 # Function to create the IP-Block for config
 create_ip_block() {
