@@ -22,8 +22,8 @@ generate_simple_client_config_install_command() {
     echo "cat << 'EOF' > \$HOME/ceremonyclient/node/.config/config.yml"
     echo "$config_content"
     echo "EOF"
-    echo "echo 'config.yml successfully installed at \$HOME/ceremonyclient/node/.config/config.yml' && \\"
-    echo "echo '💻 You can now run your Slave with clustermaster.bash! 👏' && \\"
+    echo "echo 'config.yml successfully installed at \$HOME/ceremonyclient/node/.config/config.yml'"
+    echo "echo '💻 The Slave is Setup and ready to work 👏'"
     # echo "$HOME/clustermaster.bash" - No need to run atm
     echo -e "\e[0m"
 }
