@@ -134,13 +134,11 @@ advanced_setup() {
 
 # Function to generate the client-script install one-liner
 generate_client_script_install_oneliner() {
-    echo "Generating Client-Script Install One-Liner..."
     create_client_installers
 }
 
 # Function to generate the client-config install one-liner
 generate_client_config_install_oneliner() {
-    echo "Generating Client-Config Install One-Liner..."
     generate_simple_client_config_install_command
 }
 
