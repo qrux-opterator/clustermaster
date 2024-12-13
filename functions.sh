@@ -11,8 +11,6 @@ generate_simple_client_config_install_command() {
     config_content=$(cat "$MASTER_CONFIG_FILE")
 
     # Generate the one-liner to be run on the client machine
-    echo "##################################################################################"
-    echo "################👇 COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
     echo -e "\e[34m"
     echo "mkdir -p \$HOME/ClusterMaster_Backup && \\"
     echo "if [ -f \$HOME/ceremonyclient/node/.config/config.yml ]; then \\"
@@ -26,10 +24,8 @@ generate_simple_client_config_install_command() {
     echo "EOF"
     echo "echo 'config.yml successfully installed at \$HOME/ceremonyclient/node/.config/config.yml' && \\"
     echo "echo '💻 You can now run your Slave with clustermaster.bash! 👏' && \\"
-    echo "$HOME/clustermaster.bash"
+    # echo "$HOME/clustermaster.bash" - No need to run atm
     echo -e "\e[0m"
-    echo "#######################👆  END - DONT COPY THIS LINE  👆######################"
-    echo "##################################################################################"
 }
 
 set_cluster() {
@@ -71,11 +67,11 @@ set_cluster() {
 
 
 create_client_installers() {
+    echo -e "\e[34m"
     SETTINGS_FILE="$HOME/cm_settings.txt"
     # Read and convert cm_settings.txt to a single line with \n escapes
     cm_settings_contents=$(sed ':a;N;$!ba;s/\n/\\n/g' "$SETTINGS_FILE")
-
-    echo "################👇  COPY THIS COMMAND AND RUN ON CLIENT MACHINE  👇################"
+    echo "################👇 COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
     echo "current_ip=\"\$(curl -s ifconfig.me)\" && \\"
     echo "workers_before=\$(echo -e \"$cm_settings_contents\" | awk -v myip=\"\$current_ip\" '{if (found) exit; if (\$1 == myip) found=1; else sum+=\$2} END {print sum}') && \\"
     echo "slave_workers=\$(echo -e \"$cm_settings_contents\" | awk -v myip=\"\$current_ip\" '\$1 == myip {print \$2}') && \\"
@@ -97,7 +93,9 @@ create_client_installers() {
     echo "curl -s -o \$HOME/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
     echo "if [ -f \$HOME/clustermaster.bash ]; then chmod +x \$HOME/clustermaster.bash; echo 'clustermaster.bash downloaded and made executable'; else echo 'Could not download clustermaster.bash ❌'; fi && \\"
     echo "if [ -x \$HOME/clustermaster.bash ]; then echo '💻 clustermaster.bash is ready ✅'; else echo 'clustermaster.bash is not executable ❌'; fi"
-    echo "#######################👆  END - DONT COPY THIS LINE  👆########################"
+    echo "#######################👆  END - RUN THIS ON YOUR SLAVES 👆########################"
+    echo -e "\e[0m"
+
 }
 
 
