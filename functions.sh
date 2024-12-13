@@ -99,7 +99,8 @@ create_client_installers() {
     echo "echo '💻 Downloading clustermaster.bash...' && \\"
     echo "curl -s -o \$HOME/clustermaster.bash https://raw.githubusercontent.com/qrux-opterator/clustermaster/main/clustermaster.bash && \\"
     echo "if [ -f \$HOME/clustermaster.bash ]; then chmod +x \$HOME/clustermaster.bash; echo 'clustermaster.bash downloaded and made executable'; else echo 'Could not download clustermaster.bash ❌'; fi && \\"
-    echo "if [ -x \$HOME/clustermaster.bash ]; then echo '💻 clustermaster.bash is ready ✅'; else echo 'clustermaster.bash is not executable ❌'; fi"    echo "#######################👆  END - RUN THIS ON YOUR SLAVES 👆########################"
+    echo "if [ -x \$HOME/clustermaster.bash ]; then echo '💻 clustermaster.bash is ready ✅'; else echo 'clustermaster.bash is not executable ❌'; fi"    
+    echo "#######################👆  END - RUN THIS ON YOUR SLAVES 👆########################"
     echo -e "\e[0m"
 }
 
