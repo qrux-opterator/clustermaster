@@ -80,11 +80,11 @@ create_client_installers() {
     cm_settings_contents=$(sed ':a;N;$!ba;s/\n/\\n/g' "$SETTINGS_FILE")
 
     echo "################👇 COPY THIS COMMAND AND RUN ON CLIENT MACHINE 👇################"
-    if [ -f /root/cm_ip.txt ]; then
-        echo "current_ip=\"\$(cat /root/cm_ip.txt)\" && \\"
-    else
-        echo "current_ip=\"\$(curl -s ifconfig.me)\" && \\"
-    fi
+    echo "if [ -f /root/cm_ip.txt ]; then"
+    echo "    current_ip=\"\$(cat /root/cm_ip.txt)\""
+    echo "else"
+    echo "    current_ip=\"\$(curl -s ifconfig.me)\""
+    echo "fi"
     echo "workers_before=\$(echo -e \"$cm_settings_contents\" | awk -v myip=\"\$current_ip\" '{if (found) exit; if (\$1 == myip) found=1; else sum+=\$2} END {print sum}') && \\"
     echo "slave_workers=\$(echo -e \"$cm_settings_contents\" | awk -v myip=\"\$current_ip\" '\$1 == myip {print \$2}') && \\"
     echo "version=\"$version\" && \\"
