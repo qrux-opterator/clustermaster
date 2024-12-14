@@ -38,7 +38,7 @@ else
     echo "Starting worker nodes on slave machine..."
 
     # Start worker nodes from startingCore + 1 to startingCore + maxCores
-    for core_num in $(seq $((startingCore + 1)) $((startingCore + maxCores))); do
+    for core_num in $(seq $((startingCore)) $((startingCore + maxCores-1))); do
         cmd="$DIR_PATH/node-$version-$os-$architecture --core=$core_num"
         echo "DEBUG: Deploying core $core_num with command: $cmd"
         $cmd &
