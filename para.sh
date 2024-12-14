@@ -53,8 +53,8 @@ check_workers() {
         if ! kill -0 $pid 2>/dev/null; then
             echo "WORKER FAILED: Core $core_num"
             sleep 5
-            service para restart
-            exit
+           # service para restart
+           # exit
         fi
     done
 }
