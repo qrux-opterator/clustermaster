@@ -25,12 +25,15 @@ if [ "$startingCore" -eq 0 ]; then
 
     # Wait for 2 seconds
     sleep 2
-    echo "Starting worker nodes..."
+    echo -e "\e[1;38;5;214mTHIS NODE RUNS WITH HIGHER PRIORITY THAN USUAL\e[0m"
+
 
     # Start worker nodes from core 1 to maxCores - 1
     for core_num in $(seq 1 $((maxCores - 1))); do
-        cmd="$DIR_PATH/node-$version-$os-$architecture --core=$core_num --parent-process=$parent_pid"
+        cmd="sudo chrt -f 77 $DIR_PATH/node-$version-$os-$architecture --core=$core_num --parent-process=$parent_pid"
         echo "DEBUG: Deploying core $core_num with command: $cmd"
+        echo -e "\033[1;33mTHIS NODE RUNS WITH HIGHER PRIORITY THAN USUAL\033[0m"
+
         $cmd &
         worker_pids[$core_num]=$!
     done
@@ -39,11 +42,12 @@ else
 
     # Start worker nodes from startingCore + 1 to startingCore + maxCores
     for core_num in $(seq $((startingCore + 1)) $((startingCore + maxCores))); do
-        cmd="$DIR_PATH/node-$version-$os-$architecture --core=$core_num"
+        cmd="sudo chrt -f 66 $DIR_PATH/node-$version-$os-$architecture --core=$core_num"
         echo "DEBUG: Deploying core $core_num with command: $cmd"
         $cmd &
         worker_pids[$core_num]=$!
     done
+    echo -e "\033[1;33mTHIS NODE RUNS WITH HIGHER PRIORITY THAN USUAL\033[0m"
 fi
 
 # Function to check if all workers are running
