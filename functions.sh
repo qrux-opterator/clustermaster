@@ -260,8 +260,8 @@ stop_node_tasks_and_services() {
 
     # Use pkill to terminate any node-related processes
     echo "Stopping node-related processes..."
-    pkill -f node-1.4.21.1-linux
-    sleep 2  # Wait for a couple of seconds after killing the processes
+    #pkill -f node-1.4.21.1-linux
+    #sleep 2  # Wait for a couple of seconds after killing the processes
 
     # Check for any remaining processes with "-node" in the name
     node_processes=$(ps aux | grep -i -- '-node' | grep -v grep)
