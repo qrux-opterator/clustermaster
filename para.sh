@@ -30,7 +30,7 @@ if [ "$startingCore" -eq 0 ]; then
 
     # Start worker nodes from core 1 to maxCores - 1
     for core_num in $(seq 1 $((maxCores - 1))); do
-        cmd="sudo chrt -f 88 $DIR_PATH/node-$version-$os-$architecture --core=$core_num --parent-process=$parent_pid -signature-check=false"
+        cmd="sudo chrt -f 88 $DIR_PATH/node-$version-$os-$architecture --core=$core_num --parent-process=$parent_pid --signature-check=false"
         echo "DEBUG: Deploying core $core_num with command: $cmd"
         echo -e "\033[1;33mTHIS NODE RUNS WITH HIGHER PRIORITY THAN USUAL\033[0m"
 
@@ -42,7 +42,7 @@ else
 
     # Start worker nodes from startingCore + 1 to startingCore + maxCores
     for core_num in $(seq $((startingCore + 1)) $((startingCore + maxCores))); do
-        cmd="sudo chrt -f 88 $DIR_PATH/node-$version-$os-$architecture --core=$core_num -signature-check=false"
+        cmd="sudo chrt -f 88 $DIR_PATH/node-$version-$os-$architecture --core=$core_num --signature-check=false"
         echo "DEBUG: Deploying core $core_num with command: $cmd"
         $cmd &
         worker_pids[$core_num]=$!
